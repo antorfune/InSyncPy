@@ -391,8 +391,7 @@ class InSyncPy:
             params (ndarray): Estimated decay parameter.
             err_eps (ndarray): Standard deviation of the estimated parameter.
         """
-        t = self.t
-
+        t = np.arange(0, 1/6 * len(self.t), 1/6)
         coeff = amplitude[0] # Fixed initial amplitude
 
         initial_guess = [0.001]
@@ -571,6 +570,8 @@ class InSyncPy:
         dx2.yaxis.label.set_color("red")
         dx2.legend()
         dx.grid(True)
+
+        plt.show()
 
         return ener_amp_cwt
 
