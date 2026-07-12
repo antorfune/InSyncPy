@@ -391,7 +391,10 @@ class InSyncPy:
             params (ndarray): Estimated decay parameter.
             err_eps (ndarray): Standard deviation of the estimated parameter.
         """
-        t = np.arange(0, 1/6 * len(self.t), 1/6)
+        
+        dt = self.t[1] - self.t[0]
+
+        t = np.arange(0, dt * len(self.t), dt)
         coeff = amplitude[0] # Fixed initial amplitude
 
         initial_guess = [0.001]
