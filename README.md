@@ -9,8 +9,8 @@ pip install -r requirements.txt
 ```
 
 ## Overview
-This repository implements the method described in the ***paper*** [3] for estimating the **instantaneous frequency and amplitude** of non-stationary oscillatory signals using the **Continuous Wavelet Transform (CWT)** (Mallat, 1999 [8]) and/or the **Synchrosqueezed Wavelet Transform** (Daubechies et al. 2011 [2], OverLordGoldDragon, ssqueezepy [1]). 
-The mathematical details of the approach are provided in the ***paper*** [3].
+This repository implements the method described in the (Delaunay, 2026 [3]) for estimating the **instantaneous frequency and amplitude** of non-stationary oscillatory signals using the **Continuous Wavelet Transform (CWT)** (Mallat, 1999 [8]) and/or the **Synchrosqueezed Wavelet Transform** (Daubechies et al. 2011 [2], OverLordGoldDragon, ssqueezepy [1]). 
+The mathematical details of the approach are provided in the (Delaunay, 2026 [3]).
 
 The method is designed for long-oscilating time-series data such as circadian rhythm recordings, where:
 
@@ -114,7 +114,7 @@ https://github.com/OverLordGoldDragon/ssqueezepy
 [2] I. Daubechies, J. Lu, and H. Wu (2011). 
 Synchrosqueezed wavelet transforms: An empirical mode decomposition-like tool.
 
-[3] ***citer article***
+[3] Franck Delaunay, Antoine Fortuné, Ines Krawczyk, Maréchal Anastasia, Mathieu Mezache, et al.. A Kuramoto phase model to explore the synchronisation of a network of circadian clocks. 2026. ⟨hal-05702114⟩
 
 [4] D. L. Donoho, I. M. Johnstone (1994).  
 Ideal spatial adaptation by wavelet shrinkage. 
