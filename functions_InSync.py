@@ -152,8 +152,8 @@ class InSyncPy:
     """
 
     def __init__(self, t, sig,  coeff = 9 * 1e5, trim_pt_start = 0, trim_pt_end = 1,
-                 sig_name = 'Synthetic signal', show_plot = 'False',
-                 save_csv = 'False', dir_save = './'):
+                 sig_name = 'Synthetic signal', show_plot = False,
+                 save_csv = False, dir_save = './'):
 
         self.t = t
         self.sig = sig
@@ -486,11 +486,6 @@ class InSyncPy:
     def get_loc_freq(self, matrix_coeff):
         """Estimate frequency-localized energy distribution from a time-frequency representation.
 
-        Uses class attributes:
-            self.boolshow (bool): If True, plot the energy distribution as a
-                function of frequency.
-                Defaults to False.
-
         Args:
             Matrix_coeff (array): Time-frequency coefficient matrix.
 
@@ -737,6 +732,14 @@ class InSyncPy:
                 "min_inst_period (h)": min_inst_period, 
                 "max_inst_period (h)": max_inst_period})
             df.to_csv(os.path.join(dir_save, signal_name + "_metrics.csv"), index=False)
+
+        ###############
+        # PLOT ANALYSIS
+        ###############
+
+        ?
+
+
 
         return {
             **prep, # signal denoised, detrended, trimmed, time array associated and trend
