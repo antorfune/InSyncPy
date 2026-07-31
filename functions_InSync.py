@@ -64,7 +64,7 @@ class InSyncPy:
         wx (array): CWT coefficients.
         tx (array): Synchrosqueezed CWT coefficients.
 
-        t_inst_freq (array): Time vector associated with instantaneous features.
+        t_inst (array): Time vector associated with instantaneous features.
         inst_freq (array): Instantaneous frequency extracted from the CWT ridge.
         inst_freq_smoothed (array): Smoothed instantaneous frequency.
         inst_period (array): Instantaneous period.
@@ -289,7 +289,7 @@ class InSyncPy:
                 dominant ridge of the wavelet transform.
             inst_amp (array): Estimated instantaneous amplitude extracted from the
                 dominant ridge of the wavelet transform.
-            t_inst_freq (array): Time array associated with the instantaneous frequency
+            t_inst (array): Time array associated with the instantaneous frequency
                 and amplitude estimates.
             wx (array): Continuous wavelet transform coefficients.
         """
@@ -344,7 +344,7 @@ class InSyncPy:
         )
 
         inst_freq = ridge_freq.squeeze()
-        t_inst_freq = t
+        #t_inst = t
         # Instantaneous amplitude as the ridge
         temp_wx = np.abs(wx)
         temp_amp = np.array(
@@ -352,7 +352,7 @@ class InSyncPy:
         )
         inst_amp = temp_amp.ravel()
 
-        return tx, freqs, inst_freq, inst_amp, t_inst_freq, wx
+        return tx, freqs, inst_freq, inst_amp, t, wx
 
     #################################
     # Amplitude decay
@@ -421,11 +421,6 @@ class InSyncPy:
     def get_inst_amplitude(self, matrix_coeff):
         """Estimate the instantaneous amplitude from a time-frequency representation.
 
-        Uses class attributes:
-            self.boolshow (bool): If True, plot the instantaneous amplitude
-                                            as a function of time.
-                                            Defaults to False.
-        
         Args:
             matrix_coeff (array): Time-frequency coefficient matrix.
 
@@ -464,7 +459,7 @@ class InSyncPy:
             self,
             wx,
             freqs,
-            t_inst_freq,
+            t_inst,
             inst_freq,
             inst_amp
     ):
@@ -483,7 +478,7 @@ class InSyncPy:
         Args:
         wx (array): CWT coefficients.
         freqs (array): Frequencies associated with the wavelet scales (Hz).
-        t_inst_freq (array): Time vector corresponding to the ridge-based
+        t_inst (array): Time vector corresponding to the ridge-based
             instantaneous frequency estimates.
         inst_freq (array): Instantaneous frequency extracted from ridge
             detection (Hz).
@@ -527,7 +522,7 @@ class InSyncPy:
         bx.pcolormesh(x, y, (np.abs(wx)) ** 2, cmap="viridis", shading="auto")
         # Estimated Instantaneous Frequency
         ridge_f = inst_freq
-        t_ridge = t_inst_freq
+        t_ridge = t_inst
         # Set log scale
         bx.set_yscale("log")
         bx.set_ylabel("Frequency ($\\times10^{-5}$ Hz)")
@@ -612,7 +607,7 @@ class InSyncPy:
             - 'wx' (array): CWT coefficients.
             - 'tx' (array): Synchrosqueezed CWT coefficients.
     
-            - 't_inst_freq' (array): Time vector associated with instantaneous features.
+            - 't_inst' (array): Time vector associated with instantaneous features.
             - 'inst_freq' (array): Instantaneous frequency extracted from the CWT ridge.
             - 'inst_freq_smoothed' (array): Smoothed instantaneous frequency.
             - 'inst_period' (array): Instantaneous period.
@@ -626,17 +621,19 @@ class InSyncPy:
 
         prep = self.signal_preparation()
 
+        # OMG !
         self.t = prep["t_trimmed"]
         self.sig = prep["signal_trimmed"]
 
-        tx, freqs, inst_freq, inst_amp, t_inst_freq, wx = self.sst_gmw_insync()
+        tx, freqs, inst_freq, inst_amp, t_inst, wx = self.sst_gmw_insync()
 
-        self.t = t_inst_freq
+        # OMG ! and useless : t_inst == self.t
+        #self.t = t_inst
 
         self.scaleogram_visualisation(
             wx,
             freqs,
-            t_inst_freq,
+            t_inst,
             inst_freq,
             inst_amp,
         )
@@ -658,7 +655,7 @@ class InSyncPy:
             if dir_save is None:
                 dir_save = "./"
 
-            df = pd.DataFrame({"time": t_inst_freq, "inst_period (h)": inst_period, 
+            df = pd.DataFrame({"time": t_inst, "inst_period (h)": inst_period, 
                                "inst_amp": inst_amp_sc})
             df.to_csv(os.path.join(dir_save, signal_name + "_inst_period_amplitude.csv"))
 
@@ -671,7 +668,7 @@ class InSyncPy:
             "freqs": freqs,
             "wx": wx,
             "tx": tx,
-            "t_inst_freq": t_inst_freq,
+            "t_inst": t_inst,
             "inst_freq": inst_freq,
             "inst_period": inst_period,
             "inst_amp": inst_amp,
