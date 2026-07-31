@@ -175,12 +175,10 @@ class InSyncPy:
         return out_sig, trend
 
 
-    def trimming_signal(self):
-        """Return trimmed signal
+    def trimming_signal(self, t, sig):
+        """Return trimmed  and normalized signal 
 
         Uses class attributes:
-            self.t (array): Time vector associated with the signal.
-            self.sig (array): Input signal to be trimmed.
             self.trim_pt_start (int): Number of initial peaks to remove.
             self.trim_pt_end (int): Number of final peaks to remove.
 
@@ -188,13 +186,13 @@ class InSyncPy:
             out_t (array): Time array of the trimmed signal
             out_sig (array): Trimmed signal
         """
-        sig = self.sig
+        #sig = self.sig
 
         # Supposed width of the peaks
         ind_width = 20 * 6
         peaks_ind, _ = spis.find_peaks(sig, distance=ind_width)
 
-        t = self.t
+        #t = self.t
         num_peaks_start = self.trim_pt_start
         num_peaks_end = self.trim_pt_end
 
@@ -243,8 +241,10 @@ class InSyncPy:
             - sig_trimmed
         """
         t_denoised, sig_denoised = self.denoise_dwt()
-
         sig_detrended, trend = self.detrend_smoothing_spline(t_denoised, sig_denoised)
+        # OMG !
+        # self.sig = sig_detrended
+        t_trimmed, sig_trimmed = self.trimming_signal(t_denoised, sig_detrended)
 
         save_csv = self.save_csv
         dir_save = self.dir_save
@@ -254,10 +254,6 @@ class InSyncPy:
 
             df = pd.DataFrame({"time": self.t, "detrended_signal": sig_detrended})
             df.to_csv(os.path.join(dir_save, self.sig_name + "_detrended.csv"))
-
-        self.sig = sig_detrended
-
-        t_trimmed, sig_trimmed = self.trimming_signal()
 
         return {
             "t_denoised": t_denoised,
