@@ -147,7 +147,7 @@ class InSyncPy:
         return out_t, out
 
 
-    def detrend_smoothing_spline(self, sig):
+    def detrend_smoothing_spline(self, t, sig):
         """Return the detrended and normalized signal
 
         Uses class attributes:
@@ -163,7 +163,7 @@ class InSyncPy:
         """
 
         coeff = self.coeff
-        t = self.t
+        #t = self.t
         spl = spii.make_smoothing_spline(t, sig, lam=coeff)
         trend = spl(t)
 
@@ -244,7 +244,7 @@ class InSyncPy:
         """
         t_denoised, sig_denoised = self.denoise_dwt()
 
-        sig_detrended, trend = self.detrend_smoothing_spline(sig_denoised)
+        sig_detrended, trend = self.detrend_smoothing_spline(t_denoised, sig_denoised)
 
         save_csv = self.save_csv
         dir_save = self.dir_save
@@ -641,14 +641,11 @@ class InSyncPy:
             inst_amp,
         )
 
-        signal_name = self.sig_name
-
-        self.sig_name = "Instantaneous frequency"
-        inst_freq_sc = self.detrend_smoothing_spline(inst_freq)[1]
+        # bypass prop subst
+        inst_freq_sc = self.detrend_smoothing_spline(t_inst, inst_freq)[1]
         inst_period = 1 / (inst_freq_sc * 3600)
 
-        self.sig_name = "Instantaneous amplitude"
-        inst_amp_sc = self.detrend_smoothing_spline(inst_amp)[1]
+        inst_amp_sc = self.detrend_smoothing_spline(t_inst, inst_amp)[1]
 
         decay, err_decay = self.fit_exp_decay(inst_amp_sc)
         mean_period = np.mean(inst_period)
