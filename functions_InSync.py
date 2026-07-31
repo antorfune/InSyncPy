@@ -135,15 +135,6 @@ class InSyncPy:
         out = filtered_data_dwt[:n]
         out_t = t[:n]
 
-        signal_name = self.sig_name
-        save_csv = self.save_csv
-        dir_save = self.dir_save
-        if save_csv:
-            if dir_save is None:
-                dir_save = "./"
-
-            df = pd.DataFrame({"time": out_t, "denoised_signal": out})
-            df.to_csv(os.path.join(dir_save, signal_name + "_denoised.csv"))
         return out_t, out
 
 
@@ -248,12 +239,6 @@ class InSyncPy:
 
         save_csv = self.save_csv
         dir_save = self.dir_save
-        if save_csv:
-            if dir_save is None:
-                dir_save = "./"
-
-            df = pd.DataFrame({"time": self.t, "detrended_signal": sig_detrended})
-            df.to_csv(os.path.join(dir_save, self.sig_name + "_detrended.csv"))
 
         return {
             "t_denoised": t_denoised,
@@ -634,30 +619,54 @@ class InSyncPy:
             inst_amp,
         )
 
-        # bypass prop subst
+        # Instant frequency and amplitude smoothing
         inst_freq_sc = self.detrend_smoothing_spline(t_inst, inst_freq)[1]
         inst_period = 1 / (inst_freq_sc * 3600)
-
         inst_amp_sc = self.detrend_smoothing_spline(t_inst, inst_amp)[1]
-
+        # Amplitude's decay rate estimation
         decay, err_decay = self.fit_exp_decay(inst_amp_sc)
-        mean_period = np.mean(inst_period)
-        min_period = np.min(inst_period)
-        max_period = np.max(inst_period)
+        # Instantaneous Amplitude metrics
+        mean_inst_amp = np.mean(inst_amp_sc)
+        min_inst_amp = np.min(inst_amp_sc)
+        max_inst_amp = np.max(inst_amp_sc)
+        # Instentaneous Period metrics
+        mean_inst_period = np.mean(inst_period)
+        min_inst_period = np.min(inst_period)
+        max_inst_period = np.max(inst_period)
 
-        save_csv = self.save_csv
-        dir_save = self.dir_save
-        if save_csv:
-            if dir_save is None:
-                dir_save = "./"
 
-            df = pd.DataFrame({"time": t_inst, "inst_period (h)": inst_period, 
+        ###############
+        # EXPORT TO CSV
+        ###############
+
+        if self.save_csv:
+            if not os.path.exists(self.dir_save):
+                os.makedirs(self.dir_save)
+            
+            df = pd.DataFrame({
+                "time (hours)": prep["t_denoised"], 
+                "denoised_signal": prep["sig_denoised"], 
+                "signal_trend": prep["trend"],
+                "detrended_signal": prep["sig_detrended"]
+                })
+            df.to_csv(os.path.join(self.dir_save, self.sig_name + "_detrended.csv"), index=False)
+
+            df = pd.DataFrame({"time (hours)": self.t_trimmed, "signal_model": self.sig_trimmed})
+            df.to_csv( os.path.join(self.dir_save, self.sig_name + "_model.csv"), index=False)
+
+            df = pd.DataFrame({"time": t_inst_freq, "inst_period (h)": inst_period, 
                                "inst_amp": inst_amp_sc})
-            df.to_csv(os.path.join(dir_save, signal_name + "_inst_period_amplitude.csv"))
+            df.to_csv(os.path.join(dir_save, signal_name + "_inst_period_amplitude.csv"), index=False)
 
-            df2 = pd.DataFrame({"decay": decay, "mean_period (h)": mean_period,
-                                "min_period (h)": min_period, "max_period (h)": max_period})
-            df2.to_csv(os.path.join(dir_save, signal_name + "_metrics.csv"))
+            df = pd.DataFrame({
+                "decay": decay, 
+                "mean_inst_ampl": mean_inst_amp, 
+                "min_inst_ampl": min_inst_amp, 
+                "max_inst_ampl": max_inst_amp, 
+                "mean_inst_period (h)": mean_inst_period,
+                "min_inst_period (h)": min_inst_period, 
+                "max_inst_period (h)": max_inst_period})
+            df.to_csv(os.path.join(dir_save, signal_name + "_metrics.csv"), index=False)
 
         return {
             **prep, # signal denoised, detrended, trimmed, time array associated and trend
