@@ -99,12 +99,6 @@ class InSyncPy:
         Uses class attributes:
             self.t (array): Time array
             self.signal (array): Noisy signal
-            self.signal_name (str): Name of the signal file
-            self.save_csv (bool): if True, save denoised signal to CSV.
-                                        Defaults to False.
-            self.dir_save (str): Directory path where the figure can be saved.
-                                        If None, uses ./signal_name.
-
 
         Returns:
             t_denoised (array):  Time array of the denoised signal
@@ -142,7 +136,6 @@ class InSyncPy:
         """Return the detrended and normalized signal
 
         Uses class attributes:
-            self.t (array): Time array
             self.coeff (float): Smoothing parameter
 
         Args: 
@@ -569,7 +562,9 @@ class InSyncPy:
             5. Smoothing of instantaneous features
             6. Exponential decay fitting of amplitude envelope
         
-        If 'save_csv' is enabled, two CSV files are generated:
+        If 'save_csv' is enabled, 4 CSV files are generated:
+            - One file containing the signal preparation steps (denoising, trend, detrending)
+            - One file containing the signal model (denoised, detrended, trimmed and normalized)
             - One file containing instantaneous period and amplitude.
             - One file containing summary metrics (decay rate, mean period,
             minimum period, and maximum period).
