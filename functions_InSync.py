@@ -20,6 +20,81 @@ import ssqueezepy as ssq
 from ssqueezepy.experimental import scale_to_freq
 import pywt
 
+def generate_test_signal(n_points=2000, dt=600,
+                         signal_to_noise_ratio=1.5, boolshow=True):
+    """Generate a test signal (harmonic oscillator with decaying amplitude and a parabolic trend)
+    Args:
+        n_points (int, optional): number of points of the signal. Defaults to 1000.
+        dt (int, optional): time step of the signal. Defaults to 600 seconds.
+        signal_to_noise_ratio (float, optional): ratio minimum signal amplitude 
+                                    over noise amplitude.
+                                    Lower values correspond to noisier signals. 
+                                    Defaults to 1.5.
+        boolshow (bool, optional): if True, the graphs are shown.
+                                    Defaults to True. 
+
+    Returns:
+        time (array): Time array in hours.
+        true_sig (array): Signal test without noise and trend.
+        signal_data (array): Signal test noised and trended.
+        trend (array): Trend of the signal test.
+        inst_freq (array): Instantaneous frequency of the signal test.
+        inst_amp (array): Instantaneous amplitude of the signal test.
+    """
+
+    time = np.arange(n_points) * dt
+
+    # Base frequency
+    base_freq = 0.75e-05
+
+    # Time-varying frequency
+    freq_variation = 0.75e-05 * np.exp(-2 * (1 / time[-1]) * time)  # decay
+    inst_freq = base_freq + freq_variation
+
+    # Time-varying amplitude with exponential decay
+    decay_time = time[-1] / np.log(4)  # Decay over 3/4 of total time
+    inst_amp = np.exp(-time / decay_time)
+
+    # Generate signal
+    phase = 2 * np.pi * np.cumsum(inst_freq * dt)
+    signal_data = inst_amp * np.cos(phase + np.pi / 2)
+    true_sig = np.copy(signal_data)
+    # Add some noise
+    sigma = 1
+    noise_level = 1 / 4 * 1 / signal_to_noise_ratio
+    signal_data += noise_level * np.random.normal(0, sigma, len(signal_data))
+
+    # Add trend
+    mu = time[int(len(time) / 2)]
+    trend = ((time - mu) / mu) ** 2
+    signal_data += trend
+
+    if boolshow:
+        figure, axes = plt.subplots(3, 1, figsize=(15, 12), sharex=True)
+        figure.suptitle(
+            "Synthetic signal with corresponding instantaneous frequency "
+            "and instantaneous amplitude",
+            fontsize=16,
+        )
+        axes[0].plot(time / 3600, signal_data)
+        axes[0].set_title("Signal")
+        axes[0].set_ylabel("Amplitude")
+        axes[0].grid(True)
+        # Instantaneous frequency
+        axes[1].plot(time / 3600, inst_freq * 1e5)
+        axes[1].set_title("Instantaneous Frequency")
+        axes[1].set_ylabel("Frequency (×10⁻⁵ Hz)")
+        axes[1].grid(True)
+        # Instantaneous amplitude
+        axes[2].plot(time / 3600, inst_amp)
+        axes[2].set_title("Instantaneous Amplitude")
+        axes[2].set_xlabel("Time (hours)")
+        axes[2].set_ylabel("Amplitude")
+        axes[2].grid(True)
+        plt.tight_layout()
+        plt.show()
+    return time / 3600, true_sig, signal_data, trend, inst_freq, inst_amp
+
 
 class InSyncPy:
     """
@@ -677,3 +752,24 @@ class InSyncPy:
             "decay_rate": decay,
             "decay_error": err_decay
         }
+
+
+############
+# DEMO START
+############
+
+if __name__ == "__main__":
+
+    # Generate a test signal
+    [t, real_sig, sig, real_trend, real_inst_freq, real_inst_amp] = (generate_test_signal())
+
+    # Parameters
+    coeff_smoothing = 5 * 1e5
+    num_peaks_start = 0
+    num_peaks_end = 1
+    sig_name = "Synthetic signal"
+
+    # Launch the procedure
+    model= InSyncPy(t, sig, coeff_smoothing, num_peaks_start, num_peaks_end,
+                                  sig_name, boolshow=False, save_csv=True, dir_save="./")
+    results = model.full_analysis()
