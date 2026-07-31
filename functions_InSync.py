@@ -21,7 +21,7 @@ from ssqueezepy.experimental import scale_to_freq
 import pywt
 
 def generate_test_signal(n_points=2000, dt=600,
-                         signal_to_noise_ratio=1.5, boolshow=True):
+                         signal_to_noise_ratio=1.5, show_plot=True):
     """Generate a test signal (harmonic oscillator with decaying amplitude and a parabolic trend)
     Args:
         n_points (int, optional): number of points of the signal. Defaults to 1000.
@@ -30,7 +30,7 @@ def generate_test_signal(n_points=2000, dt=600,
                                     over noise amplitude.
                                     Lower values correspond to noisier signals. 
                                     Defaults to 1.5.
-        boolshow (bool, optional): if True, the graphs are shown.
+        show_plot (bool, optional): if True, the graphs are shown.
                                     Defaults to True. 
 
     Returns:
@@ -69,7 +69,7 @@ def generate_test_signal(n_points=2000, dt=600,
     trend = ((time - mu) / mu) ** 2
     signal_data += trend
 
-    if boolshow:
+    if show_plot:
         figure, axes = plt.subplots(3, 1, figsize=(15, 12), sharex=True)
         figure.suptitle(
             "Synthetic signal with corresponding instantaneous frequency "
@@ -119,7 +119,7 @@ class InSyncPy:
         trim_pt_start (int): Number of initial peaks to remove.
         trim_pt_end (int): Number of final peaks to remove.
         sig_name (str): Name identifier for the signal.
-        boolshow (bool): If True, enables plot visualization.
+        show_plot (bool): If True, enables plot visualization.
         save_csv (bool): If True, saves results to CSV files. The results outputs are:
                             - the denoised signal,
                             - the detrended signal,
@@ -152,7 +152,7 @@ class InSyncPy:
     """
 
     def __init__(self, t, sig,  coeff = 9 * 1e5, trim_pt_start = 0, trim_pt_end = 1,
-                 sig_name = 'Synthetic signal', boolshow = 'False',
+                 sig_name = 'Synthetic signal', show_plot = 'False',
                  save_csv = 'False', dir_save = './'):
 
         self.t = t
@@ -161,7 +161,7 @@ class InSyncPy:
         self.trim_pt_start = trim_pt_start
         self.trim_pt_end = trim_pt_end
         self.sig_name = sig_name
-        self.boolshow = boolshow
+        self.show_plot = show_plot
         self.save_csv = save_csv
         self.dir_save = dir_save
 
@@ -771,5 +771,5 @@ if __name__ == "__main__":
 
     # Launch the procedure
     model= InSyncPy(t, sig, coeff_smoothing, num_peaks_start, num_peaks_end,
-                                  sig_name, boolshow=False, save_csv=True, dir_save="./")
+                                  sig_name, show_plot=False, save_csv=True, dir_save="./")
     results = model.full_analysis()
