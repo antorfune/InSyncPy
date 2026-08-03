@@ -77,8 +77,8 @@ class InSyncPy:
     """
 
     def __init__(self, t, sig,  coeff = 9 * 1e5, trim_pt_start = 0, trim_pt_end = 1,
-                 sig_name = 'Synthetic signal', boolshow = 'False',
-                 save_csv = 'False', dir_save = './'):
+                 sig_name = 'Synthetic signal', boolshow = False,
+                 save_csv = False, dir_save = './'):
 
         self.t = t
         self.sig = sig
