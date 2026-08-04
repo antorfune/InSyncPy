@@ -147,8 +147,8 @@ class InSyncPy:
         inst_amp (array): Instantaneous amplitude extracted from the CWT ridge.
         inst_amp_smoothed (array): Smoothed instantaneous amplitude.
 
-        decay_rate (float): Estimated exponential decay rate.
-        decay_error (float): Uncertainty on the estimated decay rate.
+        amp_decay_rate (float): Estimated exponential decay rate of amplitude.
+        amp_decay_error (float): Uncertainty on the amplitude estimated decay rate.
     """
 
     def __init__(self, t, sig,  coeff = 9 * 1e5, trim_pt_start = 0, trim_pt_end = 1,
@@ -689,7 +689,7 @@ class InSyncPy:
         inst_period = 1 / (inst_freq_sc * 3600)
         inst_amp_sc = self.detrend_smoothing_spline(t_inst, inst_amp)[1]
         # Amplitude's decay rate estimation
-        decay, err_decay = self.fit_exp_decay(inst_amp_sc)
+        amp_decay, amp_decay_err = self.fit_exp_decay(inst_amp_sc)
         # Instantaneous Amplitude metrics
         mean_inst_amp = np.mean(inst_amp_sc)
         min_inst_amp = np.min(inst_amp_sc)
@@ -753,8 +753,8 @@ class InSyncPy:
             "inst_amp": inst_amp,
             "inst_freq_smoothed": inst_freq_sc,
             "inst_amp_smoothed": inst_amp_sc,
-            "decay_rate": decay,
-            "decay_error": err_decay
+            "amp_decay_rate": amp_decay,
+            "amp_decay_error": amp_decay_err
         }
 
 
