@@ -622,7 +622,7 @@ class InSyncPy:
         # First sub-plot, the original time series
         ax = plt.axes([0.1, 0.75, 0.65, 0.2])
         ax.plot(x_coords, sig, "k", linewidth=1.5)
-        ax.set_title("Normalized signal")
+        ax.set_title(f"{self.sig_name} modeled signal")
         ax.grid(True)
 
         # Second sub-plot, the normalized wavelet power spectrum and significance
@@ -821,13 +821,13 @@ class InSyncPy:
             ax[1].grid(True)
             #ax[1].legend()
             # Trimming
-            ax[2].plot(t, prep["signal_detrended"], "r-", label="Detrended normalized")
-            ax[2].plot(prep["t_trimmed"], prep["signal_trimmed"], "k-", label="Trimmed")
+            ax[2].plot(t, prep["signal_detrended"], "r-", label="Detrended")
+            ax[2].plot(prep["t_trimmed"], prep["signal_trimmed"], "k-", label="Trimmed and normalized")
             ax[2].axvline(x=prep["t_trimmed"][0], color="blue", linestyle="--", label="Trim points")
             ax[2].axvline(x=prep["t_trimmed"][-1], color="blue", linestyle="--")
             ax[2].grid()
             ax[2].set_xlabel("Time (hours)")
-            ax[2].set_title("Detrended, normalized and trimmed signal")
+            ax[2].set_title("Detrended, trimmed and normalized signal")
             ax[2].legend()
             plt.tight_layout()
 
