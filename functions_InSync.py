@@ -120,6 +120,7 @@ class InSyncPy:
         trim_pt_end (int): Number of final peaks to remove.
         sig_name (str): Name identifier for the signal.
         show_plot (bool): If True, enables plot visualization.
+        save_plot (bool): If True, saves plots to jpg file.
         save_csv (bool): If True, saves results to CSV files. The results outputs are:
                             - the denoised signal,
                             - the detrended signal,
@@ -152,7 +153,7 @@ class InSyncPy:
     """
 
     def __init__(self, t, sig,  coeff = 9 * 1e5, trim_pt_start = 0, trim_pt_end = 1,
-                 sig_name = 'Synthetic signal', show_plot = False,
+                 sig_name = 'Synthetic signal', show_plot = True, save_plot = False,
                  save_csv = False, dir_save = './'):
 
         self.t = t
@@ -162,6 +163,7 @@ class InSyncPy:
         self.trim_pt_end = trim_pt_end
         self.sig_name = sig_name
         self.show_plot = show_plot
+        self.save_plot = save_plot
         self.save_csv = save_csv
         self.dir_save = dir_save
 
@@ -850,5 +852,5 @@ if __name__ == "__main__":
 
     # Launch the procedure
     model= InSyncPy(t, sig, coeff_smoothing, num_peaks_start, num_peaks_end,
-                                  sig_name, show_plot=False, save_csv=True, dir_save="./")
-    results = model.full_analysis()
+                                  sig_name, show_plot=True, save_plot=False, save_csv=False, dir_save="./")
+    model.full_analysis()
