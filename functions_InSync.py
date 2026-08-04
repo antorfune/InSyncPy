@@ -816,6 +816,32 @@ class InSyncPy:
             if self.show_plot:
                 plt.show()
 
+        ##############
+        # EXPORT PLOTS
+        ##############
+
+        if self.save_plot:
+            if not os.path.exists(self.dir_save):
+                os.makedirs(self.dir_save)
+
+            fig_processing.savefig(
+                os.path.join(self.dir_save, self.sig_name) + "_processing.jpg", 
+                format="jpg", 
+                dpi=300, 
+                bbox_inches="tight"
+            )
+            fig_scaleogram.savefig(
+                os.path.join(self.dir_save, self.sig_name) + "_scaleogram.jpg", 
+                format="jpg", 
+                dpi=300, 
+                bbox_inches="tight"
+            )
+            fig_analysis.savefig(
+                os.path.join(self.dir_save, self.sig_name) + "_analysis.jpg", 
+                format="jpg", 
+                dpi=300, 
+                bbox_inches="tight"
+            )
 
         plt.close() 
 
