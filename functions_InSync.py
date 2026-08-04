@@ -690,19 +690,23 @@ class InSyncPy:
             1. Signal preprocessing:
                 - Denoising
                 - Detrending
+                - Normalizing
                 - Trimming
             2. CWT analysis
             3. Extraction of instantaneous frequency and amplitude
-            4. Scaleogram visualization
-            5. Smoothing of instantaneous features
-            6. Exponential decay fitting of amplitude envelope
+            4. Smoothing of instantaneous features
+            5. Exponential decay fitting of amplitude envelope
+            6. Saving results to CSV files
+                - signal processing
+                - instantaneous features
+                - summary metrics
+            7. Plotting and saving figures
         
         If 'save_csv' is enabled, 4 CSV files are generated:
             - One file containing the signal preparation steps (denoising, trend, detrending)
             - One file containing the signal model (denoised, detrended, trimmed and normalized)
             - One file containing instantaneous period and amplitude.
-            - One file containing summary metrics (decay rate, mean period,
-            minimum period, and maximum period).
+            - One file containing summary metrics (period and amplitude descriptors).
         
         Returns:
         dict: Dictionary containing the preprocessing and analysis results.
