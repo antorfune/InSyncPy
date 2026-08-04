@@ -95,6 +95,10 @@ def generate_test_signal(n_points=2000, dt=600,
         plt.show()
     return time / 3600, true_sig, signal_data, trend, inst_freq, inst_amp
 
+def _count_positive_peaks(signal: np.ndarray) -> int:
+    """Return the number of positive peaks in a 1-D signal."""
+    peaks, _ = spis.find_peaks(signal, height=0)
+    return len(peaks)
 
 class InSyncPy:
     """
@@ -155,6 +159,68 @@ class InSyncPy:
     def __init__(self, t, sig,  coeff = 9 * 1e5, trim_pt_start = 0, trim_pt_end = 1,
                  sig_name = 'Synthetic signal', show_plot = True, save_plot = False,
                  save_csv = False, dir_save = './'):
+
+        # Validate input arrays have same length
+        if not isinstance(t, np.ndarray):
+            raise TypeError("t must be a numpy array")
+        if not isinstance(sig, np.ndarray):
+            raise TypeError("sig must be a numpy array")
+        if len(t) != len(sig):
+            raise ValueError(
+                f"Time vector (len={len(t)}) and signal (len={len(sig)}) must have the same length"
+            )
+        if len(t) == 0:
+            raise ValueError("Input arrays cannot be empty")
+
+        # Validate arrays contain float values
+        if t.dtype.kind != 'f':
+            raise TypeError(f"Time vector must contain float values (unit: hour), got dtype={t.dtype}")
+        if sig.dtype.kind != 'f':
+            raise TypeError(f"Signal must contain float values, got dtype={sig.dtype}")
+
+        # Validate coeff
+        if not isinstance(coeff, (int, float)):
+            raise TypeError(f"coeff must be numeric, got {type(coeff).__name__}")
+        if coeff <= 0:
+            raise ValueError(f"coeff must be positive, got {coeff}")
+
+        # Validate trim points
+        for name, val in (("trim_pt_start", trim_pt_start), ("trim_pt_end", trim_pt_end)):
+            if not isinstance(val, int):
+                raise TypeError(f"{name} must be an integer, got {type(val).__name__}")
+            if val < 0:
+                raise ValueError(f"{name} must be non-negative, got {val}")
+        if trim_pt_end <= 0:
+            raise ValueError(f"trim_pt_end must be >= 1, got {trim_pt_end}")
+        if trim_pt_start >= trim_pt_end:
+            raise ValueError(
+                f"trim_pt_start ({trim_pt_start}) must be less than trim_pt_end ({trim_pt_end})"
+            )
+        
+        # Validate trim_pt_end does not exceed number of positive peaks
+        n_peaks = _count_positive_peaks(sig)
+        if n_peaks == 0:
+            raise ValueError(
+                "No positive peaks found in signal — cannot define trim points"
+            )
+        if trim_pt_end > n_peaks:
+            raise ValueError(
+                f"trim_pt_end ({trim_pt_end}) exceeds number of positive peaks ({n_peaks})"
+            )
+
+        # Validate strings
+        for name, val in (("sig_name", sig_name), ("dir_save", dir_save)):
+            if not isinstance(val, str):
+                raise TypeError(f"{name} must be a string, got {type(val).__name__}")
+
+        # Validate booleans
+        for name, val in (
+            ("show_plot", show_plot), 
+            ("save_plot", save_plot), 
+            ("save_csv", save_csv)
+        ):
+            if not isinstance(val, bool):
+                raise TypeError(f"{name} must be a boolean, got {type(val).__name__}")
 
         self.t = t
         self.sig = sig
