@@ -724,12 +724,13 @@ class InSyncPy:
             df.to_csv(os.path.join(self.dir_save, self.sig_name + "_inst_period_amplitude.csv"), index=False)
 
             df = pd.DataFrame({
-                "decay": decay, 
-                "mean_inst_ampl": mean_inst_amp, 
-                "min_inst_ampl": min_inst_amp, 
-                "max_inst_ampl": max_inst_amp, 
-                "mean_inst_period (h)": mean_inst_period,
+                "min_inst_amp": min_inst_amp, 
+                "mean_inst_amp": mean_inst_amp, 
+                "max_inst_amp": max_inst_amp, 
+                "amp_decay": amp_decay,
+                "amp_decay_err": amp_decay_err, 
                 "min_inst_period (h)": min_inst_period, 
+                "mean_inst_period (h)": mean_inst_period,
                 "max_inst_period (h)": max_inst_period})
             df.to_csv(os.path.join(self.dir_save, self.sig_name + "_metrics.csv"), index=False)
 
