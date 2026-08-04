@@ -530,7 +530,7 @@ class InSyncPy:
             detection.
 
         Returns:
-            array: Temporal evolution of the energy of the signal.
+            fig: Matplotlib figure object.
         """
         t = self.t
         sig = self.sig
@@ -552,7 +552,7 @@ class InSyncPy:
         plt.ioff()
         figprops = dict(figsize=(15, 12), dpi=102)
 
-        plt.figure(**figprops)
+        fig = plt.figure(**figprops)
 
         # First sub-plot, the original time series
         ax = plt.axes([0.1, 0.75, 0.65, 0.2])
@@ -613,9 +613,9 @@ class InSyncPy:
         dx2.legend()
         dx.grid(True)
 
-        plt.show()
+        #plt.show()
 
-        return ener_amp_cwt
+        return fig
 
     def full_analysis(self):
         """
