@@ -307,9 +307,6 @@ class InSyncPy:
         # self.sig = sig_detrended
         t_trimmed, sig_trimmed = self.trimming_signal(t_denoised, sig_detrended)
 
-        save_csv = self.save_csv
-        dir_save = self.dir_save
-
         return {
             "t_denoised": t_denoised,
             "signal_denoised": sig_denoised,
@@ -451,7 +448,7 @@ class InSyncPy:
         initial_guess = [0.001]
 
         params, covariance = spio.curve_fit(
-            lambda t, eps: self.exponential_decay(t,  eps, coeff),
+            lambda t, eps: self.exponential_decay(t, eps, coeff),
             t,
             amplitude,
             p0=initial_guess,
@@ -868,7 +865,7 @@ class InSyncPy:
 if __name__ == "__main__":
 
     # Generate a test signal
-    [t, real_sig, sig, real_trend, real_inst_freq, real_inst_amp] = (generate_test_signal())
+    [t, real_sig, sig, real_trend, real_inst_freq, real_inst_amp] = generate_test_signal()
 
     # Parameters
     coeff_smoothing = 5 * 1e5
