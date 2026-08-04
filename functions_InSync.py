@@ -710,18 +710,18 @@ class InSyncPy:
             
             df = pd.DataFrame({
                 "time (hours)": prep["t_denoised"], 
-                "denoised_signal": prep["sig_denoised"], 
+                "denoised_signal": prep["signal_denoised"], 
                 "signal_trend": prep["trend"],
-                "detrended_signal": prep["sig_detrended"]
+                "detrended_signal": prep["signal_detrended"]
                 })
             df.to_csv(os.path.join(self.dir_save, self.sig_name + "_detrended.csv"), index=False)
 
-            df = pd.DataFrame({"time (hours)": self.t_trimmed, "signal_model": self.sig_trimmed})
+            df = pd.DataFrame({"time (hours)": prep["t_trimmed"], "signal_model": prep["signal_trimmed"]})
             df.to_csv( os.path.join(self.dir_save, self.sig_name + "_model.csv"), index=False)
 
-            df = pd.DataFrame({"time": t_inst_freq, "inst_period (h)": inst_period, 
+            df = pd.DataFrame({"time": t_inst, "inst_period (h)": inst_period, 
                                "inst_amp": inst_amp_sc})
-            df.to_csv(os.path.join(dir_save, signal_name + "_inst_period_amplitude.csv"), index=False)
+            df.to_csv(os.path.join(self.dir_save, self.sig_name + "_inst_period_amplitude.csv"), index=False)
 
             df = pd.DataFrame({
                 "decay": decay, 
@@ -731,7 +731,7 @@ class InSyncPy:
                 "mean_inst_period (h)": mean_inst_period,
                 "min_inst_period (h)": min_inst_period, 
                 "max_inst_period (h)": max_inst_period})
-            df.to_csv(os.path.join(dir_save, signal_name + "_metrics.csv"), index=False)
+            df.to_csv(os.path.join(self.dir_save, self.sig_name + "_metrics.csv"), index=False)
 
         ###############
         # PLOT ANALYSIS
