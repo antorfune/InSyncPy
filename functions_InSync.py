@@ -668,21 +668,12 @@ class InSyncPy:
         prep = self.signal_preparation()
 
         # OMG !
+        t = self.t
+        sig = self.sig
         self.t = prep["t_trimmed"]
         self.sig = prep["signal_trimmed"]
 
         tx, freqs, inst_freq, inst_amp, t_inst, wx = self.sst_gmw_insync()
-
-        # OMG ! and useless : t_inst == self.t
-        #self.t = t_inst
-
-        self.scaleogram_visualisation(
-            wx,
-            freqs,
-            t_inst,
-            inst_freq,
-            inst_amp,
-        )
 
         # Instant frequency and amplitude smoothing
         inst_freq_sc = self.detrend_smoothing_spline(t_inst, inst_freq)[1]
@@ -738,9 +729,93 @@ class InSyncPy:
         # PLOT ANALYSIS
         ###############
 
-        ?
+        if (self.show_plot or self.save_plot):
+        
+        # signal processing plots
+            fig_processing, ax = plt.subplots(3, 1, figsize=(15, 12), sharex=True)
+            fig_processing.suptitle(
+                f"Preprocessing of signal {self.sig_name}",
+                fontsize=16,
+            )
+            # Denoising
+            ax[0].plot(t, sig, "r-", label="Raw signal")
+            ax[0].plot(prep["t_denoised"], prep["signal_denoised"], "k-", label="Denoised signal")
+            ax[0].set_title("Denoised signal using Discrete Wavelet Transform (sym8)")
+            ax[0].set_ylabel("Amplitude")
+            ax[0].grid(True)
+            ax[0].legend()
+            # Detrending
+            ax[1].plot(t, prep["signal_denoised"], "k-", label="Denoised signal")
+            ax[1].plot(t, prep["trend"], "r-", label="Estimated trend")
+            ax[1].set_title("Trend approximated by smoothing splines")
+            ax[1].set_ylabel("Amplitude")
+            ax[1].grid(True)
+            #ax[1].legend()
+            # Trimming
+            ax[2].plot(t, prep["signal_detrended"], "r-", label="Detrended normalized")
+            ax[2].plot(prep["t_trimmed"], prep["signal_trimmed"], "k-", label="Trimmed")
+            ax[2].axvline(x=prep["t_trimmed"][0], color="blue", linestyle="--", label="Trim points")
+            ax[2].axvline(x=prep["t_trimmed"][-1], color="blue", linestyle="--")
+            ax[2].grid()
+            ax[2].set_xlabel("Time (hours)")
+            ax[2].set_title("Detrended, normalized and trimmed signal")
+            ax[2].legend()
+            plt.tight_layout()
+
+            #if self.show_plot:
+            #    plt.show()
+            
+            # Signal power plots
+            fig_scaleogram = self.scaleogram_visualisation(
+                wx, 
+                freqs,
+                t_inst,
+                inst_freq,
+                inst_amp,
+            )
+
+            #if self.show_plot:
+            #    plt.show()
+
+            # Signal analysis plots
+            fig_analysis, ax = plt.subplots(3, 1, figsize=(15, 12), sharex=True)
+
+            ax[0].plot(prep["t_trimmed"], prep["signal_trimmed"], "k-", label="Processed signal")
+            ax[0].set_title(self.sig_name + " modelled signal")
+            ax[0].set_ylabel("Amplitude")
+            ax[0].grid(True)
+            ax[0].legend()
+                
+            # Instantaneous frequency
+            ax[1].plot(
+                t_inst, inst_freq * 1e5, "r--", label="Estimated frequency"
+            )
+            ax[1].plot(
+                t_inst, inst_freq_sc * 1e5, "k-", label="Smoothed frequency estimate"
+            )
+            ax[1].set_title("Instantaneous frequency")
+            ax[1].set_xlabel("Time (hours)")
+            ax[1].set_ylabel("Frequency (×10⁻⁵ Hz)")
+            ax[1].grid(True)
+            ax[1].legend()
+            # Instantaneous amplitude
+            #ax[1, 1].plot(t, real_inst_amp, "r-", label="True amplitude")
+            ax[2].plot(t_inst, inst_amp, "r--", label="Estimated amplitude")
+            ax[2].plot(
+                t_inst, inst_amp_sc, "k-", label="Smoothed amplitude estimate"
+            )
+            ax[2].set_title("Instantaneous amplitude")
+            ax[2].set_xlabel("Time (hours)")
+            ax[2].set_ylabel("Amplitude")
+            ax[2].grid(True)
+            ax[2].legend()
+            plt.tight_layout()
+            
+            if self.show_plot:
+                plt.show()
 
 
+        plt.close() 
 
         return {
             **prep, # signal denoised, detrended, trimmed, time array associated and trend
