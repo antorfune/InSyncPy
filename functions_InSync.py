@@ -355,7 +355,7 @@ class InSyncPy:
 
     def signal_preparation(self):
         """ 
-        Full preparation of the signal: denoising, detrending, trimming.
+        Full preparation of the signal: denoising, detrending, trimming and normalizing.
         If ``save_csv`` is True, the detrended signal is exported to a CSV file.
 
         Returns:
