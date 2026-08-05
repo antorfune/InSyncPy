@@ -157,7 +157,7 @@ class InSyncPy:
     """
 
     def __init__(self, t, sig,  coeff = 9 * 1e5, trim_pt_start = 0, trim_pt_end = 1,
-                 sig_name = 'Synthetic signal', show_plot = True, save_plot = False,
+                 sig_name = 'Synthetic signal', show_plot = False, save_plot = False,
                  save_csv = False, dir_save = './'):
 
         # Validate input arrays have same length
