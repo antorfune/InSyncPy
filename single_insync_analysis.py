@@ -188,6 +188,40 @@ def detect_time_format(time_str_arr):
     else:
         return 'unknown'
 
+
+def time_to_hours(time_str_arr):
+    """
+    Convert an array of time strings to hours as float.
+
+    Args:
+       time_str_arr (numpy.ndarray): Array of time
+
+    Returns:
+       numpy.ndarray: Array of time in hours as float.
+    """
+    time_format = detect_time_format(time_str_arr)
+
+    if time_format == 'hours':
+        # Convert time (hh:mm) to duration in HOURS (float).
+        return time_str_arr
+
+    # Convert time (seconds) to duration in HOURS (float).
+    if time_format == 'seconds':
+        # Convert time (hh:mm) to duration in HOURS (float).
+        print(f"Detected time in seconds. Converted to hours.")
+        return time_str_arr.astype(float) / 3600
+
+    # Convert time (hh:mm) to duration in HOURS (float).
+    if time_format == 'hh:mm':
+        # Convert time (hh:mm) to duration in HOURS (float).
+        print(f"Detected HH:MM time format. Converted to hours.")
+        return times_to_duration(time_str_arr)
+
+    if time_format == 'unknown':
+        print(f"Error: unsupported time format. Please use HH:MM or hours (float).")
+        exit(1)
+
+
 # ########################
 # START
 # #########################
@@ -198,21 +232,10 @@ if len(sys.argv) < 2:
 
 # Load the signal from CSV file
 # The first line must be a header
-# The first column is the time (HH:mm), the second column is the signal (float)
+# The first column is the time (HH:mm or hours (float)), the second column is the signal value (float)
 sig_name, time, sig = load_signal(sys.argv[1])
 
-# Detect time column format and convert if necessary
-time_format = detect_time_format(time)
-
-if time_format == 'unknown':
-    print(f"Error: unsupported time format in {sys.argv[1]}. Please use HH:MM or hours (float).")
-    exit(1)
-
-# Convert time (hh:mm) to duration in HOURS (float).
-if time_format == 'hh:mm':
-    # Convert time (hh:mm) to duration in HOURS (float).
-    t = times_to_duration(time)
-    print(f"Detected HH:MM time format. Converted to {len(t)} duration points.")
+t = time_to_hours(time)
 
 # Signal modelling using InSyncPy class
 model = sinc.InSyncPy(
