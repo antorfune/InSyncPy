@@ -369,8 +369,6 @@ class InSyncPy:
         """
         t_denoised, sig_denoised = self.denoise_dwt()
         sig_detrended, trend = self.detrend_smoothing_spline(t_denoised, sig_denoised)
-        # OMG !
-        # self.sig = sig_detrended
         t_trimmed, sig_trimmed = self.trimming_signal(t_denoised, sig_detrended)
 
         return {
@@ -944,6 +942,6 @@ if __name__ == "__main__":
     sig_name = "Synthetic signal"
 
     # Launch the procedure
-    model= InSyncPy(t, sig, coeff_smoothing, num_peaks_start, num_peaks_end,
-                                  sig_name, show_plot=True, save_plot=False, save_csv=False, dir_save="./")
+    model= sinc.InSyncPy(t=t, sig=sig, coeff=coeff_smoothing, trim_pt_start=num_peaks_start, trim_pt_end=num_peaks_end,
+                                  sig_name=sig_name, show_plot=True, save_plot=False, save_csv=False, dir_save="./")
     model.full_analysis()
