@@ -120,7 +120,7 @@ def _is_time_format(arr):
     return all(time_pattern.match(s) for s in samples)
 
 
-def _is_seconds_format(arr):
+def _is_int_format(arr):
     """
     Check if array contains numeric duration values (positive integers).
     
@@ -143,7 +143,7 @@ def _is_seconds_format(arr):
         return False
 
 
-def _is_hours_format(arr):
+def _is_float_format(arr):
     """
     Check if array contains numeric duration values (positive floats).
     
