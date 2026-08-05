@@ -57,7 +57,8 @@ def load_signal(filename):
         next(reader)  # Skip the header line
         data = list(reader)
     time, signal_data = zip(*data)  # Transpose the data to get columns instead of rows
-    return np.array(time), np.array(signal_data, dtype=float)
+    
+    return sig_name, np.array(time), np.array(signal_data, dtype=float)
 
 def times_to_duration(t):
     """
@@ -173,7 +174,7 @@ if len(sys.argv) < 2:
 # Load the signal from CSV file
 # The first line must be a header
 # The first column is the time (HH:mm), the second column is the signal (float)
-time, sig = load_signal(sig_file)
+sig_name, time, sig = load_signal(sys.argv[1])
 
 # Detect time column format and convert if necessary
 time_format = detect_time_format(time)
