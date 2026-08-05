@@ -180,7 +180,7 @@ sig_name, time, sig = load_signal(sys.argv[1])
 time_format = detect_time_format(time)
 
 if time_format == 'unknown':
-    print(f"Error: unsupported time format in {sig_file}. Please use HH:MM or hours (float).")
+    print(f"Error: unsupported time format in {sys.argv[1]}. Please use HH:MM or hours (float).")
     exit(1)
 
 # Convert time (hh:mm) to duration in HOURS (float).
