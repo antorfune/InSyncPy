@@ -41,6 +41,17 @@ def load_signal(filename):
         signal_data : np.ndarray
             1D array of signal values (float64).
     """
+    
+    if not os.path.isfile(filename):
+        print(f("Error: %s is not a valid file", filename))
+        exit(1)
+
+    if not filename.endswith('.csv'):
+        print(f"Error: {sys.argv[0]} requires a csv file, with .csv extension. Given : {filename} ." )
+        exit(1)
+
+    sig_name = os.path.splitext(filename)[0]
+
     with open(filename, 'r') as f:
         reader = csv.reader(f)
         next(reader)  # Skip the header line
@@ -158,18 +169,6 @@ def detect_time_format(time_str_arr):
 if len(sys.argv) < 2:
     print(f"Usage: python3 {sys.argv[0]} <signal_file.csv>")
     sys.exit(1)
-
-sig_file = sys.argv[1]
-
-if not os.path.isfile(sig_file):
-    print(f("Error: %s is not a valid file", sig_file))
-    exit(1)
-
-if not sig_file.endswith('.csv'):
-    print(f"Error: {sys.argv[0]} requires a csv file, with .csv extension. Given : {sig_file} ." )
-    exit(1)
-
-sig_name = os.path.splitext(sig_file)[0]
 
 # Load the signal from CSV file
 # The first line must be a header
