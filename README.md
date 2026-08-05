@@ -58,6 +58,15 @@ The ridges extraction from the SST allows to track local maxima of the synchrosq
 The frequencies associated with this ridge provide an estimate of the signal's instantaneous frequency.
 Finally, the instantaneous amplitude is obtained by evaluating the magnitude of the CWT coefficients along the extracted ridge.
 
+## Input Data
+
+Input Data is a time series, as a pair of arrays:
+
+- time : array of floats, in hours or seconds (duration, amount of time)
+- signal values : array of floats, in arbitrary units
+
+Experimental log often record time as timestamps, a formatted string like "HH:MM". It must be converted to float. See example 2 below.
+
 ## Example
 
 In the file `example.py` a synthetic signal is generated with decreasing instantaneous frequency and amplitude.
@@ -80,6 +89,18 @@ We compare the true characteristics of the signal with those estimated by our me
 
 ![Results](figures/comp_final.png)
 
+## Example 2
+
+In the `example2.py` file, we illustrate the use of the InSyncPy class on a real dataset `example2_data.csv`.
+
+The input signal is a CSV file. The first column contains time values in the "HH:MM" format, and the second column contains the signal data. The script `example2.py` will automatically convert time to hours as it is the unit of the experiment.
+
+Input signal file is given as argument to the script :
+`python3 example2.py example2_data.csv`
+
+The signal is processed and analysed as described above.
+
+Edit example2.py to change the ouputs.
 
 ## Implementation details
 
@@ -105,8 +126,6 @@ The script:
 - compares the true and estimated instantaneous frequency and amplitude.
 
 # References
-
-
 
 [1] OverLordGoldDragon. ssqueezepy: synchrosqueezing toolbox.  
 https://github.com/OverLordGoldDragon/ssqueezepy
