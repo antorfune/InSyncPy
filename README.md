@@ -9,7 +9,7 @@ pip install -r requirements.txt
 ```
 
 ## Overview
-This repository implements the method described in the (Delaunay, 2026 [3]) for estimating the **instantaneous frequency and amplitude** of non-stationary oscillatory signals using the **Continuous Wavelet Transform (CWT)** (Mallat, 1999 [8]) and/or the **Synchrosqueezed Wavelet Transform** (Daubechies et al. 2011 [2], OverLordGoldDragon, ssqueezepy [1]). 
+This repository implements the method described in the (Delaunay, 2026 [3]) for estimating the **instantaneous frequency and amplitude** of non-stationary oscillatory signals using the **Continuous Wavelet Transform (CWT)** (Mallat, 1999 [8]) and/or the **Synchrosqueezed Wavelet Transform** (Daubechies et al. 2011 [2], OverLordGoldDragon, ssqueezepy [1]).  
 The mathematical details of the approach are provided in the (Delaunay, 2026 [3]).
 
 The method is designed for long-oscilating time-series data such as circadian rhythm recordings, where:
@@ -27,9 +27,11 @@ To address these kind of signals, we use a wavelet-based time-frequency framewor
 The raw signal is processed as follows:
 
 #### 1. Denoising
+
 This project uses wavelet-based denoising with the Discrete Wavelet Transform (DWT) with hard thresholding (Donoho et al. (1994) [4]) allowing high-frequency noise to be removed while preserving the oscillatory structure of the signal with minimal user inputs.
 
 We use the Symlet wavelet *sym8* for denoising because it provides:
+
 - near-symmetry, reducing phase distortions,
 - sufficient smoothness for biological oscillatory signals,
 - compact support and good localization properties,
@@ -38,13 +40,15 @@ We use the Symlet wavelet *sym8* for denoising because it provides:
 Users can choose other wavelet more suitable to their signal.
 
 #### 2. Detrending
-Spline smoothing was applied following the approach described by Hastie et al. (2009) [5] to remove the low-frequency trend of the signal. 
+
+Spline smoothing was applied following the approach described by Hastie et al. (2009) [5] to remove the low-frequency trend of the signal.
 A high regularization parameter ($\lambda = 5 \times 10^5$) was used due to the long duration and low-frequency nature of the signals.
 This parameter can be changed depending to user's need.
 
 #### 3. Trimming
-Edge trimming is applied to remove signals' artifacts induced by experimental protocol. 
-The trimming points are manually selected by the user at a signal peak. 
+
+Edge trimming is applied to remove signals' artifacts induced by experimental protocol.
+The trimming points are manually selected by the user at a signal peak.
 This step improves the assumption of local stationarity required for wavelet analysis (Torrence et al., 1998 [10]) and using a mirror padding allows us to minimise edges effects.
 
 ### Instantaneous frequency and amplitude estimation using the synchrosqueezed wavelet transform
@@ -77,10 +81,10 @@ The signal is then preprocessed using the methods described above.
 
 ![Preprocessing](figures/preprocessing.png)
 
-The figure below illustrates the time-frequency analysis of the preprocessed signal. 
-The top panel shows the normalized signal. 
+The figure below illustrates the time-frequency analysis of the preprocessed signal.
+The top panel shows the normalized signal.
 The middle panel displays the scaleogram of the signal.
-The panel on the right shows the Global Wavelet Spectrum. 
+The panel on the right shows the Global Wavelet Spectrum.
 Finally, the bottom panel presents the evolution of the signal power together with the estimated instantaneous frequency.
 
 ![Time-frequency analysis and ridge extraction](figures/ssq.png)
@@ -114,8 +118,8 @@ The functions are organized into the following sections:
 - computation of the CWT,
 - visualization tools.
 
-
 ### File example.py
+
 Example illustrating the use of the library.
 
 The script:
@@ -125,32 +129,32 @@ The script:
 - computes the CWT,
 - compares the true and estimated instantaneous frequency and amplitude.
 
-# References
+## References
 
 [1] OverLordGoldDragon. ssqueezepy: synchrosqueezing toolbox.  
 https://github.com/OverLordGoldDragon/ssqueezepy
 
-[2] I. Daubechies, J. Lu, and H. Wu (2011). 
+[2] I. Daubechies, J. Lu, and H. Wu (2011).
 Synchrosqueezed wavelet transforms: An empirical mode decomposition-like tool.
 
 [3] Franck Delaunay, Antoine Fortuné, Ines Krawczyk, Maréchal Anastasia, Mathieu Mezache, et al.. A Kuramoto phase model to explore the synchronisation of a network of circadian clocks. 2026. ⟨hal-05702114⟩
 
 [4] D. L. Donoho, I. M. Johnstone (1994).  
-Ideal spatial adaptation by wavelet shrinkage. 
+Ideal spatial adaptation by wavelet shrinkage.
 
 [5] T. Hastie, R. Tibshirani, J. Friedman (2009).  
 The Elements of Statistical Learning. Springer.
 
-[6] D. Iatsenko, P. V. E. McClintock, A. Stefanovska (2015). 
+[6] D. Iatsenko, P. V. E. McClintock, A. Stefanovska (2015).
 On the extraction of instantaneous frequencies from ridges in time-frequency representations of signals.
 
-[7] J. M. Lilly, S. C. Olhede (2012). 
+[7] J. M. Lilly, S. C. Olhede (2012).
 Generalized Morse Wavelets as a Superfamily of Analytic Wavelets.
 
-[8] S. Mallat (1999). 
+[8] S. Mallat (1999).
 A wavelet tour of signal processing.
 
-[9] E. A. Martinez-Ríos, R. Bustamante-Bello, S. Navarro-Tuch, and H. Perez-Meana (2022). 
+[9] E. A. Martinez-Ríos, R. Bustamante-Bello, S. Navarro-Tuch, and H. Perez-Meana (2022).
 Applications of the generalized morse wavelets: A review.
 
 [10] C. Torrence, G. P. Compo (1998).  
