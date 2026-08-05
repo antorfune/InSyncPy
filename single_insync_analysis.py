@@ -120,7 +120,30 @@ def _is_time_format(arr):
     return all(time_pattern.match(s) for s in samples)
 
 
-def _is_duration_format(arr):
+def _is_seconds_format(arr):
+    """
+    Check if array contains numeric duration values (positive integers).
+    
+    Attempts to convert elements to float and checks they are non-negative.
+    
+    Args:
+        arr (numpy.ndarray): Array of strings from CSV.
+    
+    Returns:
+        bool: True if all elements can be parsed as non-negative floats.
+    """
+    samples = [str(x).strip() for x in arr[:10] if str(x).strip()]
+    if not samples:
+        return False
+    
+    try:
+        values = [int(s) for s in samples]
+        return all(v >= 0 for v in values)
+    except (ValueError, TypeError):
+        return False
+
+
+def _is_hours_format(arr):
     """
     Check if array contains numeric duration values (positive floats).
     
@@ -158,8 +181,10 @@ def detect_time_format(time_str_arr):
     """
     if _is_time_format(time_str_arr):
         return 'hh:mm'
-    elif _is_duration_format(time_str_arr):
-        return 'duration'
+    elif _is_int_format(time_str_arr):
+        return 'seconds'
+    elif _is_float_format(time_str_arr):
+        return 'hours'
     else:
         return 'unknown'
 
