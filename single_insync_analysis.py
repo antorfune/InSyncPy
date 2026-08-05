@@ -25,7 +25,7 @@ import functions_InSync as sinc
 # #########################
 
 def load_signal(filename):
-     """
+    """
     Load time-signal data from a CSV file.
 
     Expects a CSV with a header row followed by rows of comma-separated
@@ -47,7 +47,7 @@ def load_signal(filename):
         exit(1)
 
     if not filename.endswith('.csv'):
-        print(f"Error: {sys.argv[0]} requires a csv file, with .csv extension. Given : {filename} ." )
+        print(f"Error: CSV file required, with .csv extension. Given : {filename} ." )
         exit(1)
 
     sig_name = os.path.splitext(filename)[0]
