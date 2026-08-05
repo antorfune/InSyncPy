@@ -101,8 +101,8 @@ if __name__ == "__main__":
     sig_name = "Synthetic signal"
 
     # Launch the procedure
-    analysis= sinc.InSyncPy(t, sig, coeff_smoothing, num_peaks_start, num_peaks_end,
-                                  sig_name, boolshow=False, save_csv=True, dir_save="./")
+    analysis = sinc.InSyncPy(t=t, sig=sig, coeff=coeff_smoothing, trim_pt_start=num_peaks_start, trim_pt_end=num_peaks_end,
+                                  sig_name=sig_name, show_plot=False, save_plot=False, save_csv=False, dir_save="./")
     results = analysis.full_analysis()
 
     # Extract analysis outputs
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     t_trimmed = results["t_trimmed"]
     sig_trimmed = results["signal_trimmed"]
 
-    t_inst_freq = results["t_inst_freq"]
+    t_inst = results["t_inst"]
     est_inst_freq = results["inst_freq"]
     inst_freq_sc = results["inst_freq_smoothed"]
     est_inst_amp = results["inst_amp"]
@@ -135,13 +135,13 @@ if __name__ == "__main__":
     ax[0].set_ylabel("Amplitude")
     ax[0].grid(True)
     # Detrending
-    ax[1].plot(t, sig_denoised, "r-", label="Denoised signal")
-    ax[1].plot(t, est_trend, "k-", label="Estimated trend")
+    ax[1].plot(t_denoised, sig_denoised, "r-", label="Denoised signal")
+    ax[1].plot(t_denoised, est_trend, "k-", label="Estimated trend")
     ax[1].set_title("Trend approximated by smoothing splines")
     ax[1].set_ylabel("Amplitude")
     ax[1].grid(True)
     # Trimming
-    ax[2].plot(t, sig_detrended, "r-", label="Normalized signal")
+    ax[2].plot(t_denoised, sig_detrended, "r-", label="Normalized signal")
     ax[2].plot(t_trimmed, sig_trimmed, "k-", label="Trimmed signal")
     ax[2].axvline(x=t_trimmed[0], color="blue", linestyle="--", label="Trim points")
     ax[2].axvline(
@@ -163,14 +163,14 @@ if __name__ == "__main__":
     # Signal
     fig, ax = plt.subplots(2, 2, figsize=(15, 12), sharex=True)
     ax[0, 0].plot(t, real_sig, "r-", label="True signal without trend")
-    ax[0, 0].plot(t, sig_detrended, "k-", label="Estimated detrended signal")
+    ax[0, 0].plot(t_denoised, sig_detrended, "k-", label="Estimated detrended signal")
     ax[0, 0].set_title("Signal")
     ax[0, 0].set_ylabel("Amplitude")
     ax[0, 0].grid(True)
     ax[0, 0].legend()
     # Trend
     ax[0, 1].plot(t, real_trend, "r-", label="True trend")
-    ax[0, 1].plot(t, est_trend, "k-", label="Estimated trend")
+    ax[0, 1].plot(t_denoised, est_trend, "k-", label="Estimated trend")
     ax[0, 1].set_title("Trend")
     ax[0, 1].set_ylabel("Amplitude")
     ax[0, 1].grid(True)
@@ -178,10 +178,10 @@ if __name__ == "__main__":
     # Instantaneous frequency
     ax[1, 0].plot(t, real_inst_freq * 1e5, "r-", label="True frequency")
     ax[1, 0].plot(
-        t_inst_freq, est_inst_freq * 1e5, "k--", label="Estimated frequency"
+        t_inst, est_inst_freq * 1e5, "k--", label="Estimated frequency"
     )
     ax[1, 0].plot(
-        t_inst_freq, inst_freq_sc * 1e5, "k-", label="Smoothed frequency estimate"
+        t_inst, inst_freq_sc * 1e5, "k-", label="Smoothed frequency estimate"
     )
     ax[1, 0].set_title("Instantaneous frequency")
     ax[1, 0].set_xlabel("Time (hours)")
@@ -190,9 +190,9 @@ if __name__ == "__main__":
     ax[1, 0].legend()
     # Instantaneous amplitude
     ax[1, 1].plot(t, real_inst_amp, "r-", label="True amplitude")
-    ax[1, 1].plot(t_inst_freq, est_inst_amp, "k--", label="Estimated amplitude")
+    ax[1, 1].plot(t_inst, est_inst_amp, "k--", label="Estimated amplitude")
     ax[1, 1].plot(
-        t_inst_freq, inst_amp_sc, "k-", label="Smoothed amplitude estimate"
+        t_inst, inst_amp_sc, "k-", label="Smoothed amplitude estimate"
     )
     ax[1, 1].set_title("Instantaneous amplitude")
     ax[1, 1].set_xlabel("Time (hours)")
