@@ -26,10 +26,6 @@ __init__(
     trim_pt_start=0,
     trim_pt_end=1,
     sig_name='Synthetic signal',
-    show_plot=False,
-    save_plot=False,
-    save_csv=False,
-    dir_save='./'
 )
 ```
 
@@ -43,10 +39,6 @@ __init__(
 | `trim_pt_start` | int | Number of peaks removed at the beginning (default: `0`) |
 | `trim_pt_end` | int | Number of peaks removed at the end (default: `1`) |
 | `sig_name` | str | Signal name (default: `'Synthetic signal'`) |
-| `show_plot` | bool | If `True`, displays plots during analysis (default: `False`) |
-| `save_plot` | bool | If `True`, saves plots to JPEG files (default: `False`) |
-| `save_csv` | bool | Export results to CSV (default: `False`) |
-| `dir_save` | str | Output directory (default: `'./'`) |
 
 ### Raises
 
@@ -166,7 +158,7 @@ where `A(t0)` is fixed to the first amplitude value and `epsilon` is estimated.
 
 ---
 
-## `full_analysis()`
+## `full_analysis(show_plot=False, save_plot=False, save_csv=False, dir_save='./')`
 
 ### Description
 
@@ -183,6 +175,15 @@ Execute the complete signal analysis pipeline.
 7. Exponential decay fitting
 8. Optional CSV export of results
 9. Optional plot generation and export
+
+### Parameters
+
+| Parameter | Type | Description |
+|------------|------|-------------|
+| `show_plot` | bool | If `True`, displays plots during analysis (default: `False`) |
+| `save_plot` | bool | If `True`, saves plots to JPEG files (default: `False`) |
+| `save_csv` | bool | Export results to CSV (default: `False`) |
+| `dir_save` | str | Output directory (default: `'./'`) |
 
 ### Returns
 
