@@ -9,6 +9,7 @@ pip install -r requirements.txt
 ```
 
 ## Overview
+
 This repository implements the method described in the (Delaunay, 2026 [3]) for estimating the **instantaneous frequency and amplitude** of non-stationary oscillatory signals using the **Continuous Wavelet Transform (CWT)** (Mallat, 1999 [8]) and/or the **Synchrosqueezed Wavelet Transform** (Daubechies et al. 2011 [2], OverLordGoldDragon, ssqueezepy [1]).  
 The mathematical details of the approach are provided in the (Delaunay, 2026 [3]).
 
@@ -66,10 +67,10 @@ Finally, the instantaneous amplitude is obtained by evaluating the magnitude of 
 
 Input Data is a time series, as a pair of arrays:
 
-- time : array of floats, in hours or seconds (duration, amount of time)
+- time : array of floats, in **hours** (0.0, 0.33, 0.66, ...)
 - signal values : array of floats, in arbitrary units
 
-Experimental log often record time as timestamps, a formatted string like "HH:MM". It must be converted to float. See example 2 below.
+Experimental logs often record time as timestamps, that is, a formatted string such as “HH:MM.”. It **must be converted to hours (float type)**. See example 2 below.
 
 ## Example
 
@@ -97,14 +98,13 @@ We compare the true characteristics of the signal with those estimated by our me
 
 In the `example2.py` file, we illustrate the use of the InSyncPy class on a real dataset `example2_data.csv`.
 
-The input signal is a CSV file. The first column contains time values in the "HH:MM" format, and the second column contains the signal data. The script `example2.py` will automatically convert time to hours as it is the unit of the experiment.
+The data is the recording of an oscillating biological signal. The recording spans 5 days. The signal is sampled every 10 minutes. The input signal is a CSV file. The first column contains time values in the "HH:MM" format, and the second column contains the signal intensity. The script `example2.py` will automatically convert time to hours (float type).
 
-Input signal file is given as argument to the script :
+The data file is given as argument to the script :
 `python3 example2.py example2_data.csv`
 
-The signal is processed and analysed as described above.
-
-Edit example2.py to change the ouputs.
+The signal is processed and analysed as described above.  
+Edit the last lines of example2.py to switch the ouputs.
 
 ## Implementation details
 
@@ -116,7 +116,10 @@ The functions are organized into the following sections:
 
 - preprocessing,
 - computation of the CWT,
-- visualization tools.
+- instantaneaous feature estimations (freq, amp)
+- amplitude's exponential decay fitting,
+- optional csv exporting,
+- optional plot generation, display and exporting.
 
 ### File example.py
 
@@ -128,6 +131,23 @@ The script:
 - preprocesses the signal,
 - computes the CWT,
 - compares the true and estimated instantaneous frequency and amplitude.
+
+### File example2.py
+
+Example illustrating an other way to use the library and the analysis is applied to a real signal.
+
+The script:
+
+- loads a csv signal file from real experiment
+- converts the time (string) into hours (float)
+- process and analyses the signal
+
+### File example2_data.csv
+
+A real signal recording in csv format
+
+- first column (string) : time values in the "HH:MM" format
+- second column (float) : signal intensity
 
 ## References
 
