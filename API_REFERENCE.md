@@ -109,8 +109,8 @@ The detrended signal is normalized by its maximum absolute value.
 ### Description
 
 Exponential decay model:
-
 $$A(t) = coeff \times e^{-decreasing\_rate \cdot t}$$
+
 ### Parameters
 
 | Parameter | Type | Description |
