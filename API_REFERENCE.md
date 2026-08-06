@@ -133,9 +133,10 @@ $$A(t) = coeff \times e^{-decreasing\_rate \cdot t}$$
 
 Fit an exponential decay model to the instantaneous amplitude envelope.
 
-The model assumes:$$A(t) = A(t_0) \times e^{-\epsilon \cdot t}$$
+The model assumes: 
+$$A(t) = A(t_0) \times e^{-\epsilon \cdot t}$$
 
-where `A(t0)` is fixed to the first amplitude value and `epsilon` is estimated.
+where $A(t0)$ is fixed to the first amplitude value and $\epsilon$ is estimated.
 
 ### Parameters
 
