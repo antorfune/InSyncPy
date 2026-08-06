@@ -233,9 +233,11 @@ sig_name, time, sig = load_signal(sys.argv[1])
 t = time_as_hours(time)
 
 # Signal modelling using InSyncPy class
-model = sinc.InSyncPy(
-    t = t, sig = sig, sig_name = sig_name, 
-    show_plot = True, save_plot = False, 
-    save_csv = False, dir_save = "example2_out")
+model = sinc.InSyncPy(t = t, sig = sig, sig_name = sig_name)
 # Analyse the signal 
-model.full_analysis()
+model.full_analysis(
+    show_plot = True, 
+    save_plot = False, 
+    save_csv = False, 
+    dir_save = "example2_out"
+    )

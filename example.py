@@ -102,8 +102,8 @@ if __name__ == "__main__":
 
     # Launch the procedure
     analysis = sinc.InSyncPy(t=t, sig=sig, coeff=coeff_smoothing, trim_pt_start=num_peaks_start, trim_pt_end=num_peaks_end,
-                                  sig_name=sig_name, show_plot=False, save_plot=False, save_csv=False, dir_save="./")
-    results = analysis.full_analysis()
+                                  sig_name=sig_name)
+    results = analysis.full_analysis(show_plot=False, save_plot=False, save_csv=False, dir_save="./")
 
     # Extract analysis outputs
     t_denoised = results["t_denoised"]

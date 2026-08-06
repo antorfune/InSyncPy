@@ -228,10 +228,10 @@ class InSyncPy:
         self.trim_pt_start = trim_pt_start
         self.trim_pt_end = trim_pt_end
         self.sig_name = sig_name
-        self.show_plot = show_plot
-        self.save_plot = save_plot
-        self.save_csv = save_csv
-        self.dir_save = dir_save
+        #self.show_plot = show_plot
+        #self.save_plot = save_plot
+        #self.save_csv = save_csv
+        #self.dir_save = dir_save
 
     ####################################
     # Preprocessing denoise and detrend
@@ -680,7 +680,8 @@ class InSyncPy:
 
         return fig
 
-    def full_analysis(self):
+    def full_analysis(self, show_plot = False, save_plot = False,
+                 save_csv = False, dir_save = './'):
         """
         Execute the full signal analysis pipeline.
 
@@ -762,9 +763,9 @@ class InSyncPy:
         # EXPORT TO CSV
         ###############
 
-        if self.save_csv:
-            if not os.path.exists(self.dir_save):
-                os.makedirs(self.dir_save)
+        if save_csv:
+            if not os.path.exists(dir_save):
+                os.makedirs(dir_save)
             
             df = pd.DataFrame({
                 "time (hours)": prep["t_denoised"], 
@@ -772,14 +773,14 @@ class InSyncPy:
                 "signal_trend": prep["trend"],
                 "detrended_signal": prep["signal_detrended"]
                 })
-            df.to_csv(os.path.join(self.dir_save, self.sig_name + "_detrended.csv"), index=False)
+            df.to_csv(os.path.join(dir_save, self.sig_name + "_detrended.csv"), index=False)
 
             df = pd.DataFrame({"time (hours)": prep["t_trimmed"], "signal_model": prep["signal_trimmed"]})
-            df.to_csv( os.path.join(self.dir_save, self.sig_name + "_model.csv"), index=False)
+            df.to_csv( os.path.join(dir_save, self.sig_name + "_model.csv"), index=False)
 
             df = pd.DataFrame({"time": t_inst, "inst_period (h)": inst_period, 
                                "inst_amp": inst_amp_sc})
-            df.to_csv(os.path.join(self.dir_save, self.sig_name + "_inst_period_amplitude.csv"), index=False)
+            df.to_csv(os.path.join(dir_save, self.sig_name + "_inst_period_amplitude.csv"), index=False)
 
             df = pd.DataFrame({
                 "min_inst_amp": min_inst_amp, 
@@ -790,13 +791,13 @@ class InSyncPy:
                 "min_inst_period (h)": min_inst_period, 
                 "mean_inst_period (h)": mean_inst_period,
                 "max_inst_period (h)": max_inst_period})
-            df.to_csv(os.path.join(self.dir_save, self.sig_name + "_metrics.csv"), index=False)
+            df.to_csv(os.path.join(dir_save, self.sig_name + "_metrics.csv"), index=False)
 
         ###############
         # PLOT ANALYSIS
         ###############
 
-        if (self.show_plot or self.save_plot):
+        if (show_plot or save_plot):
         
         # signal processing plots
             fig_processing, ax = plt.subplots(3, 1, figsize=(15, 12), sharex=True)
@@ -829,7 +830,7 @@ class InSyncPy:
             ax[2].legend()
             plt.tight_layout()
 
-            #if self.show_plot:
+            #if show_plot:
             #    plt.show()
             
             # Signal power plots
@@ -841,7 +842,7 @@ class InSyncPy:
                 inst_amp,
             )
 
-            #if self.show_plot:
+            #if show_plot:
             #    plt.show()
 
             # Signal analysis plots
@@ -878,31 +879,31 @@ class InSyncPy:
             ax[2].legend()
             plt.tight_layout()
             
-            if self.show_plot:
+            if show_plot:
                 plt.show()
 
         ##############
         # EXPORT PLOTS
         ##############
 
-        if self.save_plot:
-            if not os.path.exists(self.dir_save):
-                os.makedirs(self.dir_save)
+        if save_plot:
+            if not os.path.exists(dir_save):
+                os.makedirs(dir_save)
 
             fig_processing.savefig(
-                os.path.join(self.dir_save, self.sig_name) + "_processing.jpg", 
+                os.path.join(dir_save, self.sig_name) + "_processing.jpg", 
                 format="jpg", 
                 dpi=300, 
                 bbox_inches="tight"
             )
             fig_scaleogram.savefig(
-                os.path.join(self.dir_save, self.sig_name) + "_scaleogram.jpg", 
+                os.path.join(dir_save, self.sig_name) + "_scaleogram.jpg", 
                 format="jpg", 
                 dpi=300, 
                 bbox_inches="tight"
             )
             fig_analysis.savefig(
-                os.path.join(self.dir_save, self.sig_name) + "_analysis.jpg", 
+                os.path.join(dir_save, self.sig_name) + "_analysis.jpg", 
                 format="jpg", 
                 dpi=300, 
                 bbox_inches="tight"
@@ -943,5 +944,5 @@ if __name__ == "__main__":
 
     # Launch the procedure
     model= sinc.InSyncPy(t=t, sig=sig, coeff=coeff_smoothing, trim_pt_start=num_peaks_start, trim_pt_end=num_peaks_end,
-                                  sig_name=sig_name, show_plot=True, save_plot=False, save_csv=False, dir_save="./")
-    model.full_analysis()
+                                  sig_name=sig_name)
+    model.full_analysis(show_plot=True, save_plot=False, save_csv=False, dir_save="./")
