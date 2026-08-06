@@ -60,7 +60,7 @@ def load_signal(filename):
     
     return sig_name, np.array(time), np.array(signal_data, dtype=float)
 
-def times_to_duration(t):
+def times_str_to_hours(t):
     """
     Convert sequential HH:MM timestamps to cumulative elapsed hours.
 
@@ -215,7 +215,7 @@ def time_to_hours(time_str_arr):
     if time_format == 'hh:mm':
         # Convert time (hh:mm) to duration in HOURS (float).
         print(f"Detected HH:MM time format. Converted to hours.")
-        return times_to_duration(time_str_arr)
+        return times_str_to_hours(time_str_arr)
 
     if time_format == 'unknown':
         print(f"Error: unsupported time format. Please use HH:MM or hours (float).")
