@@ -202,12 +202,13 @@ def time_as_hours(time_str_arr):
 
     if time_format == 'hours':
         # Convert time (hh:mm) to duration in HOURS (float).
+        print(f"Detected time as float, asuming to be in hours.")
         return time_str_arr
 
     # Convert time (seconds) to duration in HOURS (float).
     if time_format == 'seconds':
         # Convert time (hh:mm) to duration in HOURS (float).
-        print(f"Detected time in seconds. Converted to hours.")
+        print(f"Detected time in seconds (int). Converted to hours.")
         return time_str_arr.astype(float) / 3600
 
     # Convert time (hh:mm) to duration in HOURS (float).
