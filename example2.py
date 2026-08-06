@@ -188,8 +188,7 @@ def detect_time_format(time_str_arr):
     else:
         return 'unknown'
 
-
-def time_to_hours(time_str_arr):
+def time_as_hours(time_str_arr):
     """
     Convert an array of time strings to hours as float.
 
@@ -235,7 +234,7 @@ if len(sys.argv) < 2:
 # The first column is the time (HH:mm or hours (float)), the second column is the signal value (float)
 sig_name, time, sig = load_signal(sys.argv[1])
 
-t = time_to_hours(time)
+t = time_as_hours(time)
 
 # Signal modelling using InSyncPy class
 model = sinc.InSyncPy(
