@@ -26,6 +26,8 @@ __init__(
     trim_pt_start=0,
     trim_pt_end=1,
     sig_name='Synthetic signal',
+    show_plot=False,
+    save_plot=False,
     save_csv=False,
     dir_save='./'
 )
@@ -37,12 +39,22 @@ __init__(
 |------------|------|-------------|
 | `t` | ndarray | Time vector |
 | `sig` | ndarray | Input signal |
-| `coeff` | float | Smoothing spline parameter |
-| `trim_pt_start` | int | Number of peaks removed at the beginning |
-| `trim_pt_end` | int | Number of peaks removed at the end |
-| `sig_name` | str | Signal name |
-| `save_csv` | bool | Export results to CSV |
-| `dir_save` | str | Output directory |
+| `coeff` | float | Smoothing spline parameter (default: `5e5`) |
+| `trim_pt_start` | int | Number of peaks removed at the beginning (default: `0`) |
+| `trim_pt_end` | int | Number of peaks removed at the end (default: `1`) |
+| `sig_name` | str | Signal name (default: `'Synthetic signal'`) |
+| `show_plot` | bool | If `True`, displays plots during analysis (default: `False`) |
+| `save_plot` | bool | If `True`, saves plots to JPEG files (default: `False`) |
+| `save_csv` | bool | Export results to CSV (default: `False`) |
+| `dir_save` | str | Output directory (default: `'./'`) |
+
+### Raises
+
+| Exception | Condition |
+|-----------|-----------|
+| `TypeError` | `t` or `sig` is not a numpy array; arrays don't contain float values; `coeff` is not numeric; `trim_pt_start` or `trim_pt_end` is not an integer; `sig_name` or `dir_save` is not a string; `show_plot`, `save_plot`, or `save_csv` is not a boolean |
+| `ValueError` | `t` and `sig` have different lengths; arrays are empty; `coeff` is not positive; `trim_pt_start` or `trim_pt_end` is negative; `trim_pt_end` is less than 1; `trim_pt_start` is >= `trim_pt_end`; `trim_pt_end` exceeds number of positive peaks in signal |
+| `ValueError` | No positive peaks found in signal (cannot define trim points) |
 
 ---
 
@@ -60,9 +72,6 @@ Apply a Discrete Wavelet Transform (DWT) denoising procedure using the Symlet-8 
 |------------|------|-------------|
 | `self.t` | ndarray | Time vector |
 | `self.sig` | ndarray | Input noisy signal |
-| `self.sig_name` | str | Signal name |
-| `self.save_csv` | bool | Export denoised signal |
-| `self.dir_save` | str | Export directory |
 
 ### Returns
 
@@ -71,22 +80,9 @@ Apply a Discrete Wavelet Transform (DWT) denoising procedure using the Symlet-8 
 | `out_t` | ndarray | Time vector |
 | `out` | ndarray | Denoised signal |
 
-### Output
-
-If `save_csv` = True, a CSV file is generated:
-
-```text
-<sig_name>_denoised.csv
-```
-
-| Column |
-|----------|
-| time |
-| denoised_signal |
-
 ---
 
-## `detrend_smoothing_spline(sig)`
+## `detrend_smoothing_spline(t, sig)`
 
 ### Description
 
@@ -98,13 +94,13 @@ The detrended signal is normalized by its maximum absolute value.
 
 | Parameter | Type | Description |
 |------------|------|-------------|
+| `t` | ndarray | Time vector |
 | `sig` | ndarray | Signal to detrend |
 
 ### Uses
 
 | Attribute | Type | Description |
 |------------|------|-------------|
-| `self.t` | ndarray | Time vector |
 | `self.coeff` | float | Smoothing parameter |
 
 ### Returns
@@ -122,9 +118,7 @@ The detrended signal is normalized by its maximum absolute value.
 
 Exponential decay model:
 
-
 $$A(t) = coeff \times e^{-decreasing\_rate \cdot t}$$
-
 ### Parameters
 
 | Parameter | Type | Description |
@@ -147,17 +141,27 @@ $$A(t) = coeff \times e^{-decreasing\_rate \cdot t}$$
 
 Fit an exponential decay model to the instantaneous amplitude envelope.
 
+The model assumes:$$A(t) = A(t_0) \times e^{-\epsilon \cdot t}$$
+
+where `A(t0)` is fixed to the first amplitude value and `epsilon` is estimated.
+
 ### Parameters
 
 | Parameter | Type | Description |
 |------------|------|-------------|
 | `amplitude` | ndarray | Instantaneous amplitude |
 
+### Uses
+
+| Attribute | Type | Description |
+|------------|------|-------------|
+| `self.t` | ndarray | Time vector (used to construct evenly-spaced time array starting at 0) |
+
 ### Returns
 
 | Output | Type | Description |
 |----------|------|-------------|
-| `params` | ndarray | Estimated decay parameter |
+| `params` | ndarray | Estimated decay parameter (epsilon) |
 | `err_eps` | ndarray | Standard deviation of the fitted parameter |
 
 ---
@@ -170,14 +174,15 @@ Execute the complete signal analysis pipeline.
 
 ### Workflow
 
-1. Signal preparation
-2. Continuous Wavelet Transform
+1. Signal preparation (denoising, detrending, trimming)
+2. Continuous Wavelet Transform with synchrosqueezing
 3. Ridge extraction
 4. Instantaneous frequency estimation
 5. Instantaneous amplitude estimation
-6. Scaleogram visualization
-7. Smoothing of instantaneous quantities
-8. Exponential decay fitting
+6. Smoothing of instantaneous quantities
+7. Exponential decay fitting
+8. Optional CSV export of results
+9. Optional plot generation and export
 
 ### Returns
 
@@ -194,44 +199,69 @@ Dictionary containing:
 | `freqs` | Frequency vector |
 | `wx` | CWT coefficients |
 | `tx` | Synchrosqueezed CWT coefficients |
-| `t_inst_freq` | Time vector |
+| `t_inst` | Time vector for instantaneous features |
 | `inst_freq` | Instantaneous frequency |
-| `inst_period` | Instantaneous period |
+| `inst_period` | Instantaneous period (in hours) |
 | `inst_amp` | Instantaneous amplitude |
-| `inst_freq_smoothed` | Smoothed frequency |
-| `inst_amp_smoothed` | Smoothed amplitude |
-| `decay_rate` | Estimated decay rate |
-| `decay_error` | Uncertainty on decay rate |
-
----
+| `inst_freq_smoothed` | Smoothed instantaneous frequency |
+| `inst_amp_smoothed` | Smoothed instantaneous amplitude |
+| `amp_decay_rate` | Estimated decay rate |
+| `amp_decay_error` | Uncertainty on decay rate |
 
 ### Output
 
-If `save_csv` = True, two CSV file are generated:
+If `save_csv` = True, four CSV files are generated:
 
-```text
-<sig_name>_inst_period_amplitude.csv
-```
+**`<sig_name>_detrended.csv`**
+
+| Column |
+|----------|
+| time (hours) |
+| denoised_signal |
+| signal_trend |
+| detrended_signal |
+
+**`<sig_name>_model.csv`**
+
+| Column |
+|----------|
+| time (hours) |
+| signal_model |
+
+**`<sig_name>_inst_period_amplitude.csv`**
 
 | Column |
 |----------|
 | time |
-| inst_period |
-| inst_amplitude |
+| inst_period (h) |
+| inst_amp |
 
-and
-
-```text
-<sig_name>_metrics.csv
-```
+**`<sig_name>_metrics.csv`**
 
 | Column |
 |----------|
-| decay_rate |
-| mean_period |
-| min_period |
-| max_period|
+| min_inst_amp |
+| mean_inst_amp |
+| max_inst_amp |
+| amp_decay |
+| amp_decay_err |
+| min_inst_period (h) |
+| mean_inst_period (h) |
+| max_inst_period (h) |
 
+### Output (Plots)
+
+If `show_plot` = True, three figures are displayed:
+
+1. **Preprocessing** — Denoising, detrending, and trimming
+2. **Scaleogram** — CWT power spectrum with instantaneous frequency and amplitude
+3. **Analysis** — Processed signal, instantaneous frequency, and amplitude
+
+If `save_plot` = True, three JPEG files are saved:
+
+- `<sig_name>_processing.jpg`
+- `<sig_name>_scaleogram.jpg`
+- `<sig_name>_analysis.jpg`
 
 ---
 
@@ -275,7 +305,7 @@ Estimate the energy distribution as a function of frequency.
 
 ---
 
-## `scaleogram_visualisation(wx, freqs, t_inst_freq, inst_freq, inst_amp)`
+## `scaleogram_visualisation(wx, freqs, t_inst, inst_freq, inst_amp)`
 
 ### Description
 
@@ -293,7 +323,7 @@ Generate a complete visualization including:
 |------------|------|-------------|
 | `wx` | ndarray | CWT coefficients |
 | `freqs` | ndarray | Frequency vector |
-| `t_inst_freq` | ndarray | Time vector |
+| `t_inst` | ndarray | Time vector for instantaneous features |
 | `inst_freq` | ndarray | Instantaneous frequency |
 | `inst_amp` | ndarray | Instantaneous amplitude |
 
@@ -301,7 +331,7 @@ Generate a complete visualization including:
 
 | Output | Type | Description |
 |----------|------|-------------|
-| `ener_amp_cwt` | ndarray | Temporal energy evolution |
+| `fig` | matplotlib.figure.Figure | Figure object containing the visualization |
 
 ---
 
@@ -330,42 +360,33 @@ Dictionary containing:
 
 ---
 
-### Output
-
-
-If `save_csv` = True, a CSV file is generated:
-
-```text
-<sig_name>_denoised.csv
-```
-
-| Column |
-|----------|
-| time |
-| detrended_signal |
-
----
-
 ## `sst_gmw_insync()`
 
 ### Description
 
 Perform a synchrosqueezed Continuous Wavelet Transform (CWT) using Generalized Morse Wavelets (GMW) and extract the dominant ridge.
 
+### Uses
+
+| Attribute | Type | Description |
+|------------|------|-------------|
+| `self.t` | ndarray | Time vector (used to compute sampling frequency) |
+| `self.sig` | ndarray | Signal to analyze |
+
 ### Returns
 
 | Output | Type | Description |
 |----------|------|-------------|
 | `tx` | ndarray | Synchrosqueezed transform |
-| `freqs` | ndarray | Frequencies associated with scales |
-| `inst_freq` | ndarray | Instantaneous frequency |
-| `inst_amp` | ndarray | Instantaneous amplitude |
-| `t_inst_freq` | ndarray | Time vector |
+| `freqs` | ndarray | Frequencies associated with scales (Hz) |
+| `inst_freq` | ndarray | Instantaneous frequency (ridge-based) |
+| `inst_amp` | ndarray | Instantaneous amplitude (ridge-based) |
+| `t_inst` | ndarray | Time vector |
 | `wx` | ndarray | CWT coefficients |
 
 ---
 
-## `trimming_signal()`
+## `trimming_signal(t, sig)`
 
 ### Description
 
@@ -375,6 +396,13 @@ The number of peaks removed at the beginning and at the end is controlled throug
 
 - `trim_pt_start`
 - `trim_pt_end`
+
+### Parameters
+
+| Parameter | Type | Description |
+|------------|------|-------------|
+| `t` | ndarray | Time vector |
+| `sig` | ndarray | Signal to trim |
 
 ### Uses
 
