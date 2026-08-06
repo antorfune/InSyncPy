@@ -24,43 +24,7 @@ import functions_InSync as sinc
 # FUNCTIONS
 # #########################
 
-def load_signal(filename):
-    """
-    Load time-signal data from a CSV file.
-
-    Expects a CSV with a header row followed by rows of comma-separated
-    time and signal values. Returns two NumPy arrays: time and signal.
-
-    Parameters:
-        filename : str or Path
-            Path to the CSV file.
-
-    Returns:
-        time : np.ndarray
-            1D array of time values (string dtype from CSV).
-        signal_data : np.ndarray
-            1D array of signal values (float64).
-    """
-    
-    if not os.path.isfile(filename):
-        print(f("Error: %s is not a valid file", filename))
-        exit(1)
-
-    if not filename.endswith('.csv'):
-        print(f"Error: CSV file required, with .csv extension. Given : {filename} ." )
-        exit(1)
-
-    sig_name = os.path.splitext(filename)[0]
-
-    with open(filename, 'r') as f:
-        reader = csv.reader(f)
-        next(reader)  # Skip the header line
-        data = list(reader)
-    time, signal_data = zip(*data)  # Transpose the data to get columns instead of rows
-    
-    return sig_name, np.array(time), np.array(signal_data, dtype=float)
-
-def times_str_to_hours(t):
+def _times_str_to_hours(t):
     """
     Convert sequential HH:MM timestamps to cumulative elapsed hours.
 
@@ -75,7 +39,6 @@ def times_str_to_hours(t):
         numpy.ndarray: Cumulative elapsed time in hours, starting from 0.
                        Returns an empty array of dtype float if input is empty.
     """
-
     if not t.any():
         return np.array([], dtype=float)
 
@@ -119,7 +82,6 @@ def _is_time_format(arr):
     
     return all(time_pattern.match(s) for s in samples)
 
-
 def _is_int_format(arr):
     """
     Check if array contains numeric duration values (positive integers).
@@ -141,7 +103,6 @@ def _is_int_format(arr):
         return all(v >= 0 for v in values)
     except (ValueError, TypeError):
         return False
-
 
 def _is_float_format(arr):
     """
@@ -165,8 +126,7 @@ def _is_float_format(arr):
     except (ValueError, TypeError):
         return False
 
-
-def detect_time_format(time_str_arr):
+def _detect_time_format(time_str_arr):
     """
     Detect whether the input time column contains HH:MM timestamps or numeric durations.
     
@@ -198,7 +158,7 @@ def time_as_hours(time_str_arr):
     Returns:
        numpy.ndarray: Array of time in hours as float.
     """
-    time_format = detect_time_format(time_str_arr)
+    time_format = _detect_time_format(time_str_arr)
 
     if time_format == 'hours':
         # Convert time (hh:mm) to duration in HOURS (float).
@@ -215,11 +175,46 @@ def time_as_hours(time_str_arr):
     if time_format == 'hh:mm':
         # Convert time (hh:mm) to duration in HOURS (float).
         print(f"Detected HH:MM time format. Converted to hours.")
-        return times_str_to_hours(time_str_arr)
+        return _times_str_to_hours(time_str_arr)
 
     if time_format == 'unknown':
         print(f"Error: unsupported time format. Please use HH:MM or hours (float).")
         exit(1)
+
+def load_signal(filename):
+    """
+    Load time-signal data from a CSV file.
+
+    Expects a CSV with a header row followed by rows of comma-separated
+    time and signal values. Returns two NumPy arrays: time and signal.
+
+    Parameters:
+        filename : str or Path
+            Path to the CSV file.
+
+    Returns:
+        time : np.ndarray
+            1D array of time values (string dtype from CSV).
+        signal_data : np.ndarray
+            1D array of signal values (float64).
+    """
+    if not os.path.isfile(filename):
+        print(f("Error: %s is not a valid file", filename))
+        exit(1)
+
+    if not filename.endswith('.csv'):
+        print(f"Error: CSV file required, with .csv extension. Given : {filename} ." )
+        exit(1)
+
+    sig_name = os.path.splitext(filename)[0]
+
+    with open(filename, 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the header line
+        data = list(reader)
+    time, signal_data = zip(*data)  # Transpose the data to get columns instead of rows
+    
+    return sig_name, np.array(time), np.array(signal_data, dtype=float)
 
 
 # ########################
@@ -240,7 +235,7 @@ t = time_as_hours(time)
 # Signal modelling using InSyncPy class
 model = sinc.InSyncPy(
     t = t, sig = sig, sig_name = sig_name, 
-    show_plot = False, save_plot = False, 
-    save_csv = True, dir_save = "example2_out")
+    show_plot = True, save_plot = False, 
+    save_csv = False, dir_save = "example2_out")
 # Analyse the signal 
 model.full_analysis()
