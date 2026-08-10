@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Python program to extract wave parameters from a single signal using InSyncPy class.
+Python script to extract oscillation parameters from a single signal using InSyncPy class.
 
 Antoine Fortuné
 Anastasia MARECHAL
