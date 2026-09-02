@@ -1,0 +1,273 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+A python script to recursively explore a directory (dataset) and 
+to extract the oscillation parameters from any csv file, using InSyncPy class. 
+The csv file is assumed to contain the time series of an oscillating signal.
+
+The outputs are written in the insync_out/ directory of the current directory. 
+Sub-directories organisation from the source directory is preserved in the insync_out/.
+
+Antoine Fortuné
+"""
+
+#######################################################################################################################
+import os
+import sys
+import csv
+from datetime import datetime, timedelta
+import numpy as np
+import matplotlib.pyplot as plt
+import functions_InSync as sinc
+####################################################################################################
+
+# set data_dir with the first argument of the command
+data_dir = sys.argv[1]
+
+####################################################################################################
+
+# #########################
+# FUNCTIONS
+# #########################
+
+def _times_str_to_hours(t):
+    """
+    Convert sequential HH:MM timestamps to cumulative elapsed hours.
+
+    Handles day transitions: e.g., 23:00 -> 01:00 is treated as 2 hours elapsed.
+    For time series spanning multiple days, modular arithmetic correctly computes
+    elapsed time across any number of day boundaries.
+
+    Args:
+        t (numpy.ndarray): Array of time strings in '%H:%M' format (e.g., '23:00', '01:00').
+
+    Returns:
+        numpy.ndarray: Cumulative elapsed time in hours, starting from 0.
+                       Returns an empty array of dtype float if input is empty.
+    """
+    if not t.any():
+        return np.array([], dtype=float)
+
+    # Vectorized conversion to seconds
+    seconds = np.array([
+        datetime.strptime(ts, '%H:%M').hour * 3600 + 
+        datetime.strptime(ts, '%H:%M').minute * 60 
+        for ts in t
+    ], dtype=float)
+
+    # Calculate differences between consecutive times
+    diffs = np.diff(seconds)
+
+    # Handle any number of day wraparounds using modular arithmetic
+    diffs = np.mod(diffs, 86400)
+
+    # Cumulative sum and convert to hours
+    time_series = np.insert(np.cumsum(diffs), 0, 0)
+
+    return time_series / 3600
+
+def _is_time_format(arr):
+    """
+    Check if array contains HH:MM time format strings.
+    
+    Returns True if all elements match the HH:MM pattern (e.g., '08:30', '23:59').
+    Returns False if elements appear to be numeric durations.
+    
+    Args:
+        arr (numpy.ndarray): Array of strings from CSV.
+    
+    Returns:
+        bool: True if time format, False if duration format.
+    """
+    import re
+    # Check first few non-empty elements for HH:MM pattern
+    time_pattern = re.compile(r'^\d{2}:\d{2}$')
+    samples = [str(x).strip() for x in arr[:10] if str(x).strip()]
+    if not samples:
+        return False
+    
+    return all(time_pattern.match(s) for s in samples)
+
+def _is_int_format(arr):
+    """
+    Check if array contains numeric duration values (positive integers).
+    
+    Attempts to convert elements to float and checks they are non-negative.
+    
+    Args:
+        arr (numpy.ndarray): Array of strings from CSV.
+    
+    Returns:
+        bool: True if all elements can be parsed as non-negative floats.
+    """
+    samples = [str(x).strip() for x in arr[:10] if str(x).strip()]
+    if not samples:
+        return False
+    
+    try:
+        values = [int(s) for s in samples]
+        return all(v >= 0 for v in values)
+    except (ValueError, TypeError):
+        return False
+
+def _is_float_format(arr):
+    """
+    Check if array contains numeric duration values (positive floats).
+    
+    Attempts to convert elements to float and checks they are non-negative.
+    
+    Args:
+        arr (numpy.ndarray): Array of strings from CSV.
+    
+    Returns:
+        bool: True if all elements can be parsed as non-negative floats.
+    """
+    samples = [str(x).strip() for x in arr[:10] if str(x).strip()]
+    if not samples:
+        return False
+    
+    try:
+        values = [float(s) for s in samples]
+        return all(v >= 0 for v in values)
+    except (ValueError, TypeError):
+        return False
+
+def _detect_time_format(time_str_arr):
+    """
+    Detect whether the input time column contains HH:MM timestamps or numeric durations.
+    
+    Checks the format of time strings and returns a string indicating the detected format.
+    
+    Args:
+        time_str_arr (numpy.ndarray): Array of time strings from CSV.
+    
+    Returns:
+        str: 'hh:mm' if time format detected, 'duration' if duration format detected,
+             'unknown' if format cannot be determined.
+    """
+    if _is_time_format(time_str_arr):
+        return 'hh:mm'
+    elif _is_int_format(time_str_arr):
+        return 'seconds'
+    elif _is_float_format(time_str_arr):
+        return 'hours'
+    else:
+        return 'unknown'
+
+def time_as_hours(time_str_arr):
+    """
+    Convert an array of time strings to hours as float.
+
+    Args:
+       time_str_arr (numpy.ndarray): Array of time
+
+    Returns:
+       numpy.ndarray: Array of time in hours as float.
+    """
+    time_format = _detect_time_format(time_str_arr)
+
+    if time_format == 'hours':
+        # Convert time (hh:mm) to duration in HOURS (float).
+        print(f"Detected time as float, asuming to be in hours.")
+        return time_str_arr
+
+    # Convert time (seconds) to duration in HOURS (float).
+    if time_format == 'seconds':
+        # Convert time (hh:mm) to duration in HOURS (float).
+        print(f"Detected time in seconds (int). Converted to hours.")
+        return time_str_arr.astype(float) / 3600
+
+    # Convert time (hh:mm) to duration in HOURS (float).
+    if time_format == 'hh:mm':
+        # Convert time (hh:mm) to duration in HOURS (float).
+        print(f"Detected HH:MM time format. Converted to hours.")
+        return _times_str_to_hours(time_str_arr)
+
+    if time_format == 'unknown':
+        print(f"Error: unsupported time format. Please use HH:MM or hours (float).")
+        exit(1)
+
+def load_signal(filename):
+    """
+    Load time-signal data from a CSV file.
+
+    Expects a CSV with a header row followed by rows of comma-separated
+    time and signal values. Returns two NumPy arrays: time and signal.
+
+    Parameters:
+        filename : str or Path
+            Path to the CSV file.
+
+    Returns:
+        time : np.ndarray
+            1D array of time values (string dtype from CSV).
+        signal_data : np.ndarray
+            1D array of signal values (float64).
+    """
+    if not os.path.isfile(filename):
+        print(f("Error: %s is not a valid file", filename))
+        exit(1)
+
+    if not filename.endswith('.csv'):
+        print(f"Error: CSV file required, with .csv extension. Given : {filename} ." )
+        exit(1)
+
+    sig_name = os.path.splitext(filename)[0]
+
+    with open(filename, 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the header line
+        data = list(reader)
+    time, signal_data = zip(*data)  # Transpose the data to get columns instead of rows
+    
+    return sig_name, np.array(time), np.array(signal_data, dtype=float)
+
+def recurcive_csv_processing(source_path, dest_path):
+    if not os.path.exists(dest_path):
+        os.makedirs(dest_path)
+
+    for file in os.listdir(source_path):
+        file_path = os.path.join(source_path, file)
+        if os.path.isfile(file_path) and file.endswith('.csv'):
+            
+            # Load the signal from CSV file
+            # The first line must be a header
+            # The first column is the time (HH:mm), the second column is the signal (float)
+            sig_name, time, sig = load_signal(file_path)
+            
+            # Convert time (hh:mm) to HOURS (float).
+            t = time_as_hours(time)
+            #t = time # if time is already in hours
+
+            # creer un objet InSyncPy avec le signal
+            signal = sinc.InSyncPy(t = t, sig = sig, sig_name = sig_name)
+            # lancer l'analyse complète
+            signal.full_analysis(
+                show_plot = True, 
+                save_plot = False, 
+                save_csv = False, 
+                dir_save = dest_path
+                )
+             
+        elif os.path.isdir(file_path):
+            subdir_name = os.path.basename(file_path)
+            recurcive_csv_processing(file_path, os.path.join(dest_path, subdir_name))
+
+
+# ########################
+# START
+# #########################
+
+if len(sys.argv) < 2:
+    print(f"Usage: python3 {sys.argv[0]} <dataset_dir>")
+    sys.exit(1)
+
+# test data_dir is a valid directory
+if not os.path.isdir(data_dir):
+    print("Error: data_dir is not a valid directory")
+    sys.exit(1)
+
+recurcive_csv_processing(source_path=data_dir, dest_path="./insync_out")
+
+exit
