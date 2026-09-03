@@ -224,6 +224,8 @@ def load_signal(filename):
     return sig_name, np.array(time), np.array(signal_data, dtype=float)
 
 def recurcive_csv_processing(source_path, dest_path):
+    print(f"Parsing dir : {source_path}")
+
     if not os.path.exists(dest_path):
         os.makedirs(dest_path)
 
@@ -231,6 +233,7 @@ def recurcive_csv_processing(source_path, dest_path):
         file_path = os.path.join(source_path, file)
         if os.path.isfile(file_path) and file.endswith('.csv'):
             
+            print(f"Processing {file}")
             # Load the signal from CSV file
             # The first line must be a header
             # The first column is the time (HH:mm), the second column is the signal (float)
