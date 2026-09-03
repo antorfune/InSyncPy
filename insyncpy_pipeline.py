@@ -247,9 +247,9 @@ def recurcive_csv_processing(source_path, dest_path):
             signal = sinc.InSyncPy(t = t, sig = sig, sig_name = sig_name)
             # lancer l'analyse complète
             signal.full_analysis(
-                show_plot = True, 
-                save_plot = False, 
-                save_csv = False, 
+                show_plot = False, 
+                save_plot = True, 
+                save_csv = True, 
                 dir_save = dest_path
                 )
              
