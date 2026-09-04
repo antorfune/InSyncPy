@@ -486,17 +486,15 @@ class InSyncPy:
         """
         return coeff * np.exp(-decreasing_rate * time)
 
-    def fit_exp_decay(self, amplitude):
+    def fit_exp_decay(self, time, amplitude):
         """
         Fit an exponential decay model to an instantaneous amplitude envelope.
         The model assumes:
             A(t) = A(t0) * exp(-epsilon t)
         where A(t0) is fixed to the first amplitude value and epsilon is estimated.
 
-        Uses class attributes:
-            self.t (ndarray): Time vector.
-
         Args: 
+            time (ndarray): Time vector (in hours).
             amplitude (ndarray): Instantaneous amplitude of the signal.
 
         Returns:
@@ -504,10 +502,18 @@ class InSyncPy:
             err_eps (ndarray): Standard deviation of the estimated parameter.
         """
         
-        dt = self.t[1] - self.t[0]
-
-        t = np.arange(0, dt * len(self.t), dt)
-        coeff = amplitude[0] # Fixed initial amplitude
+        # Validate input arrays have same length
+        if len(time) != len(amplitude):
+            raise ValueError(
+                f"Time (len={len(time)}) and amplitude (len={len(amplitude)}) arrays "
+                "must have the same length"
+            )
+        
+        dt = time[1] - time[0]
+        
+        # Use the actual time values
+        t = time
+        coeff = amplitude[0]  # Fixed initial amplitude
 
         initial_guess = [0.001]
 
@@ -525,10 +531,9 @@ class InSyncPy:
         return params, err_eps
 
 
-    #################################
-    # Visualization
-    #################################
-
+        #################################
+        # Visualization
+        #################################
 
     def get_inst_amplitude(self, matrix_coeff):
         """Estimate the instantaneous amplitude from a time-frequency representation.
@@ -748,7 +753,7 @@ class InSyncPy:
         inst_period = 1 / (inst_freq_sc * 3600)
         inst_amp_sc = self.detrend_smoothing_spline(t_inst, inst_amp)[1]
         # Amplitude's decay rate estimation
-        amp_decay, amp_decay_err = self.fit_exp_decay(inst_amp_sc)
+        amp_decay, amp_decay_err = self.fit_exp_decay(t_inst, inst_amp_sc)
         # Instantaneous Amplitude metrics
         mean_inst_amp = np.mean(inst_amp_sc)
         min_inst_amp = np.min(inst_amp_sc)
