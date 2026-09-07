@@ -215,7 +215,7 @@ def load_signal(filename):
         print(f"Error: CSV file required, with .csv extension. Given : {filename} ." )
         exit(1)
 
-    sig_name = os.path.splitext(filename)[0]
+    sig_name = os.path.basename(os.path.splitext(filename)[0])
 
     with open(filename, 'r') as f:
         reader = csv.reader(f)
