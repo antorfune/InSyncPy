@@ -4,12 +4,14 @@
 """
 A python script to recursively explore a directory (dataset) and 
 to extract the oscillation parameters from any csv file, using InSyncPy class. 
-The csv file is assumed to contain the time series of an oscillating signal.
+The csv file is assumed to contain the time series (unit: hour) 
+and the amplitude of an oscillating signal.
 
-The outputs are written in the insync_out/ directory of the current directory. 
-Sub-directories organisation from the source directory is preserved in the insync_out/.
+The outputs are written in the output directory (default: ./insync_out/). 
+Sub-directories organisation from the source directory is preserved 
+in the output_dir/.
 
-Antoine Fortuné
+iBV - Antoine Fortuné
 """
 
 #######################################################################################################################
