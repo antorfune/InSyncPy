@@ -14,6 +14,7 @@ Antoine Fortuné
 
 #######################################################################################################################
 import os
+import shutil
 import sys
 import csv
 from datetime import datetime, timedelta
@@ -24,6 +25,7 @@ import functions_InSync as sinc
 
 # set data_dir with the first argument of the command
 data_dir = sys.argv[1]
+output_dir = "./insync_out"
 
 ####################################################################################################
 
@@ -271,6 +273,8 @@ if not os.path.isdir(data_dir):
     print("Error: data_dir is not a valid directory")
     sys.exit(1)
 
-recurcive_csv_processing(source_path=data_dir, dest_path="./insync_out")
+if os.path.exists(output_dir):
+    shutil.rmtree(output_dir)
+recurcive_csv_processing(source_path=data_dir, dest_path=output_dir)
 
 exit
