@@ -242,6 +242,45 @@ def sanitize_lc_signame(name: str):
         name = name.replace(suffix, "")
     return name
 
+def recat_metrics_files(output_dir: str):
+    """
+    Concatenate all *_metrics.csv files in output_dir into a single metrics_sumup.csv.
+    
+    Args:
+        output_dir (str): Root directory containing the processed results.
+    """
+    metrics_files = []
+    for root, dirs, files in os.walk(output_dir):
+        for file in files:
+            if file.endswith('_metrics.csv'):
+                metrics_files.append(os.path.join(root, file))
+    
+    if not metrics_files:
+        print("No metrics files found. Skipping concatenation.")
+        return
+    
+    # Read the first file to get the header
+    with open(metrics_files[0], 'r') as f:
+        reader = csv.reader(f)
+        header = next(reader)
+        first_data = list(reader)
+    
+    # Write the concatenated file
+    output_file = os.path.join(output_dir, 'metrics_sumup.csv')
+    with open(output_file, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(first_data)
+        
+        # Append data from remaining files
+        for metrics_file in metrics_files[1:]:
+            with open(metrics_file, 'r') as infile:
+                reader = csv.reader(infile)
+                next(reader)  # Skip header
+                writer.writerows(reader)
+    
+    print(f"Concatenated {len(metrics_files)} metrics files into {output_file}")
+
 def recurcive_csv_processing(source_path, dest_path):
     print(f"Parsing dir : {source_path}")
 
@@ -295,5 +334,8 @@ if not os.path.isdir(data_dir):
 if os.path.exists(output_dir):
     shutil.rmtree(output_dir)
 recurcive_csv_processing(source_path=data_dir, dest_path=output_dir)
+
+# Concatenate all metrics files
+recat_metrics_files(output_dir)
 
 exit
