@@ -225,6 +225,21 @@ def load_signal(filename):
     
     return sig_name, np.array(time), np.array(signal_data, dtype=float)
 
+def sanitize_lc_signame(name: str):
+    """
+    Remove lumicycler preprocess suffixes from filenames if exists.
+    
+    Args:
+        name (str): Input string, e.g. 'LANEA4_Bmal1_61W_Raw_boat-in'
+    
+    Returns:
+        str: name with '_boat-in' and '_Raw' suffix removed, e.g. 'LANEA4_Bmal1_61W'
+    """
+    suffixes = ["_boat-in","_Raw"]
+    for suffix in suffixes:
+        name = name.replace(suffix, "")
+    return name
+
 def recurcive_csv_processing(source_path, dest_path):
     print(f"Parsing dir : {source_path}")
 
@@ -235,11 +250,13 @@ def recurcive_csv_processing(source_path, dest_path):
         file_path = os.path.join(source_path, file)
         if os.path.isfile(file_path) and file.endswith('.csv'):
             
-            print(f"Processing {file}")
+            print(f"Processing file: {file}")
             # Load the signal from CSV file
             # The first line must be a header
             # The first column is the time (HH:mm), the second column is the signal (float)
             sig_name, time, sig = load_signal(file_path)
+            sig_name = sanitize_lc_signame(sig_name)
+            print(f"Sig_name: {sig_name}")
             
             # Convert time (hh:mm) to HOURS (float).
             t = time_as_hours(time)

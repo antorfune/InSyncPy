@@ -216,6 +216,20 @@ def load_signal(filename):
     
     return sig_name, np.array(time), np.array(signal_data, dtype=float)
 
+def sanitize_lc_signame(name: str):
+    """
+    Remove lumicycler preprocess suffixes from filenames if exists.
+    
+    Args:
+        name (str): Input string, e.g. 'LANEA4_Bmal1_61W_Raw_boat-in'
+    
+    Returns:
+        str: name with '_boat-in' and '_Raw' suffix removed, e.g. 'LANEA4_Bmal1_61W'
+    """
+    suffixes = ["_boat-in","_Raw"]
+    for suffix in suffixes:
+        name = name.replace(suffix, "")
+    return name
 
 # ########################
 # START
@@ -229,7 +243,8 @@ if len(sys.argv) < 2:
 # The first line must be a header
 # The first column is the time (HH:mm or hours (float)), the second column is the signal value (float)
 sig_name, time, sig = load_signal(sys.argv[1])
-
+sig_name = sanitize_lc_signame(sig_name)
+            
 t = time_as_hours(time)
 
 # Signal modelling using InSyncPy class
