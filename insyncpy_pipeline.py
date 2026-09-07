@@ -54,14 +54,11 @@ def _times_str_to_hours(t):
         return np.array([], dtype=float)
 
     # Vectorized conversion to seconds
-    seconds = np.array([
-        datetime.strptime(ts, '%H:%M').hour * 3600 + 
-        datetime.strptime(ts, '%H:%M').minute * 60 
-        for ts in t
-    ], dtype=float)
+    hours = np.array([int(ts.split(':')[0]) * 3600 + int(ts.split(':')[1]) * 60 
+                      for ts in t], dtype=float)
 
     # Calculate differences between consecutive times
-    diffs = np.diff(seconds)
+    diffs = np.diff(hours)
 
     # Handle any number of day wraparounds using modular arithmetic
     diffs = np.mod(diffs, 86400)
@@ -322,20 +319,51 @@ def recurcive_csv_processing(source_path, dest_path):
 # START
 # #########################
 
-if len(sys.argv) < 2:
-    print(f"Usage: python3 {sys.argv[0]} <dataset_dir>")
-    sys.exit(1)
+def main():
+    """
+    Main entry point with proper memory management.
+    """
+    global data_dir, output_dir
 
-# test data_dir is a valid directory
-if not os.path.isdir(data_dir):
-    print("Error: data_dir is not a valid directory")
-    sys.exit(1)
+    start_time = datetime.now()
+    print(f"insyncpy-pipeline started: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Dataset path : {data_dir}")
 
-if os.path.exists(output_dir):
-    shutil.rmtree(output_dir)
-recurcive_csv_processing(source_path=data_dir, dest_path=output_dir)
+    if len(sys.argv) < 2:
+        print(f"Usage: python3 {sys.argv[0]} <dataset_dir>")
+        sys.exit(1)
 
-# Concatenate all metrics files
-recat_metrics_files(output_dir)
+    # test data_dir is a valid directory
+    if not os.path.isdir(data_dir):
+        print("Error: data_dir is not a valid directory")
+        sys.exit(1)
 
-exit
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+    
+    try:
+
+        recurcive_csv_processing(source_path=data_dir, dest_path=output_dir)
+
+        # Concatenate all metrics files
+        recat_metrics_files(output_dir)
+
+        end_time = datetime.now()
+        duration = end_time - start_time
+        print("\n -----------------------------")
+        print(f"Results saved in {output_dir}")
+        print(f"Execution completed: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"Total execution time: {duration}")
+        print("-----------------------------")
+        
+    except KeyboardInterrupt:
+        print("\nProcess interrupted by user.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error during processing: {e}")
+        sys.exit(1)
+    
+    return 0
+
+if __name__ == "__main__":
+    exit(main())
