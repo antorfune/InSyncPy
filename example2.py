@@ -248,7 +248,7 @@ sig_name = sanitize_lc_signame(sig_name)
 t = time_as_hours(time)
 
 # Signal modelling using InSyncPy class
-model = sinc.InSyncPy(t = t, sig = sig, sig_name = sig_name)
+model = sinc.InSyncPy(t = t, sig = sig, sig_name = sig_name, trim_pt_start = 0, trim_pt_end = 1)
 # Analyse the signal 
 model.full_analysis(
     show_plot = True, 
