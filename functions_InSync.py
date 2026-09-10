@@ -756,10 +756,12 @@ class InSyncPy:
         amp_decay, amp_decay_err = self.fit_exp_decay(t_inst, inst_amp_sc)
         # Instantaneous Amplitude metrics
         mean_inst_amp = np.mean(inst_amp_sc)
+        median_inst_amp = np.median(inst_amp_sc)
         min_inst_amp = np.min(inst_amp_sc)
         max_inst_amp = np.max(inst_amp_sc)
         # Instentaneous Period metrics
         mean_inst_period = np.mean(inst_period)
+        median_inst_period = np.median(inst_period)
         min_inst_period = np.min(inst_period)
         max_inst_period = np.max(inst_period)
 
@@ -791,11 +793,13 @@ class InSyncPy:
                 "signame": self.sig_name,
                 "min_inst_amp": min_inst_amp, 
                 "mean_inst_amp": mean_inst_amp, 
+                "median_inst_amp": median_inst_amp, 
                 "max_inst_amp": max_inst_amp, 
                 "amp_decay": amp_decay,
                 "amp_decay_err": amp_decay_err, 
                 "min_inst_period (h)": min_inst_period, 
                 "mean_inst_period (h)": mean_inst_period,
+                "median_inst_period (h)": median_inst_period,
                 "max_inst_period (h)": max_inst_period,
                 "model_path": os.path.join(dir_save, self.sig_name + "_model.csv")})
             df.to_csv(os.path.join(dir_save, self.sig_name + "_metrics.csv"), index=False)
@@ -868,6 +872,7 @@ class InSyncPy:
             ax[1].plot(
                 t_inst, inst_freq_sc * 1e5, "k-", label="Smoothed frequency estimate"
             )
+            ax[1].axhline(y=1/(median_inst_period*3600)*1e5, color="blue", linestyle="--", label="Median")
             ax[1].set_title("Instantaneous frequency")
             ax[1].set_xlabel("Time (hours)")
             ax[1].set_ylabel("Frequency (×10⁻⁵ Hz)")
@@ -879,6 +884,7 @@ class InSyncPy:
             ax[2].plot(
                 t_inst, inst_amp_sc, "k-", label="Smoothed amplitude estimate"
             )
+            ax[2].axhline(y=median_inst_amp, color="blue", linestyle="--", label="Median")
             ax[2].set_title("Instantaneous amplitude")
             ax[2].set_xlabel("Time (hours)")
             ax[2].set_ylabel("Amplitude")
