@@ -30,6 +30,9 @@ data_dir = sys.argv[1]
 output_dir = "./insync_out"
 
 ####################################################################################################
+# OpenBLAS parallelism Control
+os.environ['OMP_NUM_THREADS'] = '4'
+os.environ['OPENBLAS_NUM_THREADS'] = '4'
 
 # #########################
 # FUNCTIONS
