@@ -206,7 +206,7 @@ def load_signal(filename):
         print(f"Error: CSV file required, with .csv extension. Given : {filename} ." )
         exit(1)
 
-    sig_name = os.path.splitext(filename)[0]
+    sig_name = os.path.basename(os.path.splitext(filename)[0])
 
     with open(filename, 'r') as f:
         reader = csv.reader(f)
@@ -244,7 +244,7 @@ if len(sys.argv) < 2:
 # The first column is the time (HH:mm or hours (float)), the second column is the signal value (float)
 sig_name, time, sig = load_signal(sys.argv[1])
 sig_name = sanitize_lc_signame(sig_name)
-            
+print(f"Sig_name: {sig_name}")   
 t = time_as_hours(time)
 
 # Signal modelling using InSyncPy class
