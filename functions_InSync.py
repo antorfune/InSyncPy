@@ -192,10 +192,10 @@ class InSyncPy:
                 raise ValueError(f"{name} must be non-negative, got {val}")
         if trim_pt_end <= 0:
             raise ValueError(f"trim_pt_end must be >= 1, got {trim_pt_end}")
-        if trim_pt_start >= trim_pt_end:
-            raise ValueError(
-                f"trim_pt_start ({trim_pt_start}) must be less than trim_pt_end ({trim_pt_end})"
-            )
+        #if trim_pt_start >= trim_pt_end:
+        #    raise ValueError(
+        #        f"trim_pt_start ({trim_pt_start}) must be less than trim_pt_end ({trim_pt_end})"
+        #    )
         
         # Validate trim_pt_end does not exceed number of positive peaks
         n_peaks = _count_positive_peaks(sig)
@@ -685,6 +685,8 @@ class InSyncPy:
 
         return fig
 
+#####
+
     def full_analysis(self, show_plot = False, save_plot = False,
                  save_csv = False, dir_save = './'):
         """
@@ -922,7 +924,7 @@ class InSyncPy:
                 bbox_inches="tight"
             )
 
-        plt.close() 
+        plt.close('all') 
 
         return {
             **prep, # signal denoised, detrended, trimmed, time array associated and trend
