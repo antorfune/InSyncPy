@@ -251,8 +251,8 @@ t = time_as_hours(time)
 model = sinc.InSyncPy(t = t, sig = sig, sig_name = sig_name, trim_pt_start = 0, trim_pt_end = 2)
 # Analyse the signal 
 model.full_analysis(
-    show_plot = True, 
-    save_plot = False, 
+    show_plot = False, 
+    save_plot = True, 
     save_csv = True, 
     dir_save = "./"
     )
