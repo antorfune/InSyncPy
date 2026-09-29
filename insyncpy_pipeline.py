@@ -9,7 +9,10 @@ and the amplitude of an oscillating signal.
 
 The outputs are written in the output directory (default: ./insync_out/). 
 Sub-directories organisation from the source directory is preserved 
-in the output_dir/.
+in the output_dir/. 
+
+A compilation of all _metrics.csv file is written in the 
+output_dir/sumup.csv file.
 
 iBV - Antoine Fortuné
 """

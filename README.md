@@ -72,7 +72,7 @@ Input Data is a time series, as a pair of arrays:
 
 Experimental logs often record time as timestamps, that is, a formatted string such as “HH:MM.”. It **must be converted to hours (float type)**. See example 2 below.
 
-## Example
+## Examples
 
 In the file `example.py` a synthetic signal is generated with decreasing instantaneous frequency and amplitude.
 
@@ -94,17 +94,27 @@ We compare the true characteristics of the signal with those estimated by our me
 
 ![Results](figures/comp_final.png)
 
-## Example 2
+## insyncpy_single
 
-In the `example2.py` file, we illustrate the use of the InSyncPy class on a real dataset `example2_data.csv`.
+In the `insyncpy_single.py` file, we illustrate the use of the InSyncPy class on a real signal file `example2_data.csv`.
 
-The data is the recording of an oscillating biological signal. The recording spans 5 days. The signal is sampled every 10 minutes. The input signal is a CSV file. The first column contains time values in the "HH:MM" format, and the second column contains the signal intensity. The script `example2.py` will automatically convert time to hours (float type).
+This dataset contains recordings of an oscillating biological signal captured over a 5-day period. Signal intensity is sampled every 10 minutes. The input is provided as a CSV file, where the first column contains time values in "HH:MM" format and the second column contains the corresponding signal intensity. The script `insyncpy_single.py` automatically converts the time values to hours as floating-point numbers. The script `insyncpy_single.py` will automatically convert time to hours (float type).
 
 The data file is given as argument to the script :
-`python3 example2.py example2_data.csv`
-
+`python3 insyncpy_single.py example2_data.csv`  
 The signal is processed and analysed as described above.  
-Edit the last lines of example2.py to switch the ouputs.
+The outputs (csv and plots) are saved in the current directory.
+
+Edit the last 2 lines of `insyncpy_single.py` to switch the ouputs or change output dir.
+
+## insyncpy_pipeline
+
+The script `insyncpy_pipeline.py` parses a dataset directory and uses InSyncPy class to extract the oscillation parameters from any csv file. Each csv file is assumed to contain the time series (float hour or string "HH:MM") and the amplitude of an oscillating signal.
+
+The outputs are written in the output directory (default: ./insync_out/). Sub-directories organisation in the source directory is preserved in the output_dir/. 
+
+A compilation of all `_metrics.csv` file is written in the `output_dir/sumup.csv` file.
+
 
 ## Implementation details
 
@@ -132,7 +142,7 @@ The script:
 - computes the CWT,
 - compares the true and estimated instantaneous frequency and amplitude.
 
-### File example2.py
+### File insyncpy_single.py
 
 Example illustrating an other way to use the library and the analysis is applied to a real signal.
 
@@ -141,6 +151,7 @@ The script:
 - loads a csv signal file from real experiment
 - converts the time (string) into hours (float)
 - process and analyses the signal
+- Save plots as jpg and csv files and oscillation parameters as csv
 
 ### File example2_data.csv
 
