@@ -248,11 +248,11 @@ print(f"Sig_name: {sig_name}")
 t = time_as_hours(time)
 
 # Signal modelling using InSyncPy class
-model = sinc.InSyncPy(t = t, sig = sig, sig_name = sig_name, trim_pt_start = 0, trim_pt_end = 1)
+model = sinc.InSyncPy(t = t, sig = sig, sig_name = sig_name, trim_pt_start = 0, trim_pt_end = 2)
 # Analyse the signal 
 model.full_analysis(
     show_plot = True, 
     save_plot = False, 
-    save_csv = False, 
-    dir_save = "example2_out"
+    save_csv = True, 
+    dir_save = "./"
     )
